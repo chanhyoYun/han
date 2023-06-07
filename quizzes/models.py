@@ -4,12 +4,12 @@ from django.db import models
 class Quiz(models.Model):
     """퀴즈 모델
 
-    퀴즈의 제목, 문항, 설명, 난이도가 저장되는 모델입니다.
+    퀴즈의 제목, 문항, 해설, 난이도가 저장되는 모델입니다.
 
     Attributes:
         title (CharField): 제목.
         content (CharField): 문항.
-        explain (TextField): 설명.
+        explain (TextField): 해설.
         difficulty (PositiveIntegerField): 난이도. 양수.
     """
 
@@ -31,6 +31,6 @@ class Option(models.Model):
         is_answer (BooleanField): 정답여부 Bool값. 정답 True. 오답 False.
     """
 
-    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     content = models.CharField(max_length=256)
     is_answer = models.BooleanField()
