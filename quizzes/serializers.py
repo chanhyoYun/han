@@ -16,5 +16,5 @@ class OptionSerializer(serializers.ModelSerializer):
     def __init__(self, instance=None, data=..., **kwargs):
         quiz_id = kwargs.pop("quiz_id")
         for option in data:
-            option["quiz_id"] = quiz_id
+            option["quiz"] = quiz_id
         super().__init__(instance, data, **kwargs)
