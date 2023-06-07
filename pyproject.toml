@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "han"
+version = "0.1.0"
+description = ""
+authors = ["Churnobyl <tjdcjfals@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.6"
+django = "^4.2.2"
+djangorestframework = "^3.14.0"
+markdown = "^3.4.3"
+django-filter = "^23.2"
+psycopg2 = "^2.9.6"
+django-cors-headers = "^4.0.0"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
