@@ -6,11 +6,13 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from users.models import User, Achievement
 
+
 class UserView(APIView):
     """회원가입
-    
+
     회원가입을 처리하는 뷰
     """
+
     def post(self, request):
         """회원가입
 
@@ -25,29 +27,36 @@ class UserView(APIView):
             serializer.save()
             return Response({"message": "가입완료"}, status=status.HTTP_201_CREATED)
         else:
-            return Response({"message":f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 class UserDetailView(APIView):
     """회원정보
 
     회원 정보 보기, 수정, 삭제를 처리하는 뷰
     """
+
     def get(self, request, user_id):
         """회원정보 조회
 
         Args:
             user_id : 회원 고유 아이디
-            
+
         Returns:
             status 200 : 회원정보 반환
             status 404 : 회원정보 없음
         """
         user = get_object_or_404(User, id=user_id)
         serializer = UserSerializer(user)
-        achieve = get_object_or_404(Achievement, pk=serializer.data['wear_achievement'])
+        achieve = get_object_or_404(Achievement, pk=serializer.data["wear_achievement"])
         serializer_wear = AchievementSerializer(achieve)
-        return Response({"유저":serializer.data, "칭호":serializer_wear.data}, status=status.HTTP_200_OK)
-    
+        return Response(
+            {"유저": serializer.data, "칭호": serializer_wear.data},
+            status=status.HTTP_200_OK,
+        )
+
     def patch(self, request, user_id):
         """회원정보 수정
 
@@ -65,13 +74,17 @@ class UserDetailView(APIView):
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message":"수정완료"}, status=status.HTTP_200_OK)
+                return Response({"message": "수정완료"}, status=status.HTTP_200_OK)
             else:
-                return Response({"message":f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": f"${serializer.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
-            return Response({"message":"유저가 다릅니다."}, status=status.HTTP_401_UNAUTHORIZED)
-        
-    
+            return Response(
+                {"message": "유저가 다릅니다."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
     def delete(self, request, user_id):
         """회원 탈퇴(비활성화)
 
@@ -89,18 +102,19 @@ class UserDetailView(APIView):
             user.save()
             return Response({"message": "탈퇴완료"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message":"유저가 다릅니다."}, status=status.HTTP_401_UNAUTHORIZED)
-        
+            return Response(
+                {"message": "유저가 다릅니다."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+
 class AchievementView(APIView):
     """칭호 관리
 
     전체 칭호를 보고 보유하고 있는 칭호 확인
     보유하고 있는 칭호 중 원하는 칭호로 교체
     """
+
     def get(self, request, achieve_id):
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
-    
-    

@@ -9,7 +9,6 @@ from users.models import User, Achievement
 
 
 class UserCreationForm(forms.ModelForm):
-
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(
         label="Password confirmation", widget=forms.PasswordInput
@@ -39,19 +38,43 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "password", "is_active", "is_admin",
-                  "username", "image", "experiment", "level", "day", "wear_achievement", "achieve"]
+        fields = [
+            "email",
+            "password",
+            "is_active",
+            "is_admin",
+            "username",
+            "image",
+            "experiment",
+            "level",
+            "day",
+            "wear_achievement",
+            "achieve",
+        ]
 
 
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ["email", "is_active","is_admin"]
+    list_display = ["email", "is_active", "is_admin"]
     list_filter = ["is_admin", "is_active"]
     fieldsets = [
         (None, {"fields": ["email", "password"]}),
-        ("Personal info", {"fields": ["username", "image", "experiment", "level", "day", "wear_achievement", "achieve"]}),
+        (
+            "Personal info",
+            {
+                "fields": [
+                    "username",
+                    "image",
+                    "experiment",
+                    "level",
+                    "day",
+                    "wear_achievement",
+                    "achieve",
+                ]
+            },
+        ),
         ("Permissions", {"fields": ["is_admin", "is_active"]}),
     ]
 
@@ -68,10 +91,13 @@ class UserAdmin(BaseUserAdmin):
     ordering = ["email"]
     filter_horizontal = []
 
+
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 
+
 class AchievementAdmin(admin.ModelAdmin):
     list_display = ["title"]
+
 
 admin.site.register(Achievement, AchievementAdmin)
