@@ -31,6 +31,6 @@ class Option(models.Model):
         is_answer (BooleanField): 정답여부 Bool값. 정답 True. 오답 False.
     """
 
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="options")
     content = models.CharField(max_length=256)
     is_answer = models.BooleanField()
