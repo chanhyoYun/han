@@ -39,17 +39,17 @@ class QuizView(APIView):
             정상 201: "제출완료" 메세지
             오류 400: 올바르지 않은 입력
         """
-        quiz = QuizSerializer(data=request.data["quiz"])
-        if quiz.is_valid():
-            save_quiz = quiz.save()
+        quiz_serializer = QuizSerializer(data=request.data["quiz"])
+        if quiz_serializer.is_valid():
+            save_quiz = quiz_serializer.save()
         else:
-            return Response(quiz.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(quiz_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        options = OptionSerializer(data=request.data["options"], many=True)
-        if options.is_valid():
-            options.save(quiz_id=save_quiz.id)
+        opt_serializer = OptionSerializer(data=request.data["options"], many=True)
+        if opt_serializer.is_valid():
+            opt_serializer.save(quiz_id=save_quiz.id)
         else:
-            return Response(options.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(opt_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "제출완료"}, status=status.HTTP_201_CREATED)
 
