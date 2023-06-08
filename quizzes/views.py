@@ -45,11 +45,9 @@ class QuizView(APIView):
         else:
             return Response(quiz.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        options = OptionSerializer(
-            data=request.data["options"], many=True, quiz_id=save_quiz.id
-        )
+        options = OptionSerializer(data=request.data["options"], many=True)
         if options.is_valid():
-            options.save()
+            options.save(quiz_id=save_quiz.id)
         else:
             return Response(options.errors, status=status.HTTP_400_BAD_REQUEST)
 
