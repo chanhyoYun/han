@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from quizzes.models import Quiz, Option
+from quizzes.models import Quiz, Option, QuizReport
 
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -53,3 +53,14 @@ class QuizGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = "__all__"
+
+
+class QuizReportSerializer(serializers.ModelSerializer):
+    """퀴즈 신고 시리얼라이저
+
+    퀴즈 신고를 받을때 사용됩니다.
+    """
+
+    class Meta:
+        model = QuizReport
+        fields = ("content",)
