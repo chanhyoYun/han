@@ -9,6 +9,7 @@ from quizzes.serializers import (
 )
 from rest_framework.generics import get_object_or_404
 from quizzes.models import Quiz
+from quizzes.generators import QuizGenerator
 
 
 class QuizView(APIView):
@@ -26,7 +27,7 @@ class QuizView(APIView):
         Returns:
             정상 200: 퀴즈 데이터 제공
         """
-        quiz = Quiz.objects.all()
+        quiz = QuizGenerator.generate()
         serializer = QuizGetSerializer(quiz, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
