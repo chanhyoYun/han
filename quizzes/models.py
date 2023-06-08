@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 
 
 class Quiz(models.Model):
@@ -34,3 +35,21 @@ class Option(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="options")
     content = models.CharField(max_length=256)
     is_answer = models.BooleanField()
+
+
+class QuizReport(models.Model):
+    """퀴즈 신고용 모델
+
+    퀴즈 신고내용을 저장하는 모델입니다.
+
+    Attributes:
+        quiz_id (ForeignKey): 신고대상 퀴즈의 ID.
+        user (ForeignKey): 신고한 user의 ID.
+        content (BooleanField): 신고 내용.
+        created_at (DateTimeField): 신고 날짜.
+    """
+
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="reports")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
