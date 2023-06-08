@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from users import views
+from users import views, social
 
 urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="login"),
@@ -13,4 +13,7 @@ urlpatterns = [
     path(
         "achieve/<int:achieve_id>/", views.AchievementView.as_view(), name="achievement"
     ),
+    path("google/login", social.google_login, name="google_login"),
+    path("google/callback/", social.google_callback, name="google_callback"),
+    path("google/login/finish/", social.GoogleLogin.as_view(), name="google"),
 ]
