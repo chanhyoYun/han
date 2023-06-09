@@ -49,12 +49,21 @@ class UserDetailView(APIView):
         """
         user = get_object_or_404(User, id=user_id)
         serializer = UserSerializer(user)
-        wear = get_object_or_404(Achievement, pk=serializer.data["wear_achievement"])
-        serializer_wear = AchievementSerializer(wear)
-        return Response(
-            {"유저": serializer.data, "칭호": serializer_wear.data},
-            status=status.HTTP_200_OK,
-        )
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.data["wear_achievement"] != -1:
+            wear = get_object_or_404(
+                Achievement, pk=serializer.data["wear_achievement"]
+            )
+            serializer_wear = AchievementSerializer(wear)
+            return Response(
+                {"유저": serializer.data, "칭호": serializer_wear.data},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"유저": serializer.data, "칭호": "null"},
+                status=status.HTTP_200_OK,
+            )
 
     def patch(self, request, user_id):
         """회원정보 수정
