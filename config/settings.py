@@ -84,6 +84,16 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # ASGI
 ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                (os.environ.get("BACKEND_HOST"), os.environ.get("CHANNEL_LAYER_PORT"))
+            ],
+        },
+    },
+}
 
 
 # REST_FRAMEWORK
