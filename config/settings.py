@@ -92,7 +92,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-LOGIN_REDIRECT_URL = "http://127.0.0.1:5500/html/index.html"
+LOGIN_REDIRECT_URL = (
+    "http://"
+    + os.environ.get("FRONTEND_HOST")
+    + ":"
+    + os.environ.get("FRONTEND_PORT")
+    + "/html/index.html"
+)
 
 # REST_FRAMEWORK
 REST_FRAMEWORK = {
@@ -109,10 +115,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "han_DB",
-        "USER": "han_admin",
+        "USER": os.environ.get("DB_USERNAME"),
         "PASSWORD": os.environ.get("DB_PASSWORD"),
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 
