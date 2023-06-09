@@ -16,6 +16,9 @@ django-cors-headers = "^4.0.0"
 python-dotenv = "^1.0.0"
 pillow = "^9.5.0"
 djangorestframework-simplejwt = "^5.2.2"
+requests = "^2.31.0"
+bs4 = "^0.0.1"
+selenium = "^4.9.1"
 
 
 [build-system]
