@@ -95,6 +95,22 @@ CHANNEL_LAYERS = {
     },
 }
 
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": os.path.join(
+#             "redis://",
+#             os.environ.get("USERNAME"),
+#             ":",
+#             os.environ.get("PASSWORD"),
+#             "@",
+#             os.environ.get("BACKEND_HOST"),
+#             ":",
+#             os.environ.get("CACHES_PORT"),
+#         ),
+#     }
+# }
+
 
 # REST_FRAMEWORK
 REST_FRAMEWORK = {
