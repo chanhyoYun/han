@@ -23,6 +23,7 @@ from crawled_data.models import WordQuiz, WordQuizOption
 
 def crawled_quiz():
     """네이버 단어 퀴즈를 크롤링하는 함수
+
     Returns:
         data(list): [{
                 "title": "문제의 제목 부분",
