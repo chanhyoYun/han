@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "users",
     "quizzes",
+    "battle",
     "crawled_data",
     "corsheaders",
 ]
@@ -79,6 +81,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+# ASGI
+ASGI_APPLICATION = "config.asgi.application"
+
 
 # REST_FRAMEWORK
 REST_FRAMEWORK = {
