@@ -106,23 +106,33 @@ def crawled_quiz():
                 wrong_options = soup.select(
                     "#quiz_answer > div.choice_result_area > ul > li.wrong > span"
                 )
+                try:
+                    # 딕셔너리에 순서대로 저장
+                    quiz = {
+                        "title": title,
+                        "explain": explain.text.replace("\xa0", " "),
+                        "rate": rate.text.replace("%", ""),
+                        "option": [
+                            {"content": correct_option.text, "is_answer": True},
+                        ],
+                    }
 
-                # 딕셔너리에 순서대로 저장
-                quiz = {
-                    "title": title,
-                    "explain": explain.text.replace("\xa0", " "),
-                    "rate": rate.text.replace("%", ""),
-                    "option": [
-                        {"content": correct_option.text, "is_answer": True},
-                    ],
-                }
-
-                # 오답이 여러개일 경우, option에 순서대로 append
-                for wrong in wrong_options:
-                    quiz["option"].append({"content": wrong.text, "is_answer": False})
+                    # 오답이 여러개일 경우, option에 순서대로 append
+                    for wrong in wrong_options:
+                        quiz["option"].append(
+                            {"content": wrong.text, "is_answer": False}
+                        )
+                except:
+                    # 값을 잘 가져오지 못할 때 / 오류가 발생 했을 때
+                    quiz = {
+                        "title": "🐛 오류 발생",
+                        "explain": f"링크 확인 : {new_link}",
+                        "rate": 0,
+                        "option": [{"content": "", "is_answer": True}],
+                    }
+                    print(f"{i}번째 문제에서 오류 발생!")
 
                 data.append(quiz)
-
                 driver.close()
         driver.switch_to.window(driver.window_handles[0])
 
