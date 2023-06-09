@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "users",
     "quizzes",
+    "crawled_data",
     "corsheaders",
     "django.contrib.sites",
     "rest_framework.authtoken",
