@@ -49,8 +49,8 @@ class User(AbstractBaseUser):
     level = models.PositiveIntegerField(default=0)
     day = models.PositiveIntegerField(default=0)
 
-    achieve = models.ManyToManyField("Achievement", verbose_name="achieves", blank=True)
-    wear_achievement = models.IntegerField(null=True)
+    achieve = models.ManyToManyField("Achievement", blank=True, verbose_name="achieves")
+    wear_achievement = models.IntegerField(default=-1)
 
     objects = MyUserManager()
 
