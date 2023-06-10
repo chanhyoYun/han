@@ -11,9 +11,13 @@ class CurrentBattleList(models.Model):
 
     Attributes:
         btl_title (CharField) : 배틀 제목
+
         btl_created_at (DateTimeField) : 배틀 방 생성 시간
+
         btl_updated_at (DateTimeField) : 배틀 시작 시간
+
         host_user (ForeignKey) : 호스트 유저
+
         opponent_user (ForeignKey) : 상대방 유저
     """
 

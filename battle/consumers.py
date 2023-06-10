@@ -1,6 +1,7 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from battle.models import CurrentBattleList
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -21,6 +22,8 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
+        # CurrentBattleList.objects.create()
+
         # 웹소켓 연결 시점
         await self.accept()
 
@@ -38,6 +41,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         """
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        print(text_data_json)
 
         # 그룹에게 같은 메세지 전달
         await self.channel_layer.group_send(
