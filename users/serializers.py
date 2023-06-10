@@ -13,7 +13,7 @@ class AchievementSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    achieve = AchievementSerializer(many=True)
+    achieve = AchievementSerializer(many=True, required=False)
 
     class Meta:
         model = User

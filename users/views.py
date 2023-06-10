@@ -1,4 +1,3 @@
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from users.serializers import UserSerializer, AchievementSerializer
 from rest_framework.response import Response
@@ -50,12 +49,21 @@ class UserDetailView(APIView):
         """
         user = get_object_or_404(User, id=user_id)
         serializer = UserSerializer(user)
-        achieve = get_object_or_404(Achievement, pk=serializer.data["wear_achievement"])
-        serializer_wear = AchievementSerializer(achieve)
-        return Response(
-            {"유저": serializer.data, "칭호": serializer_wear.data},
-            status=status.HTTP_200_OK,
-        )
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.data["wear_achievement"] != -1:
+            wear = get_object_or_404(
+                Achievement, pk=serializer.data["wear_achievement"]
+            )
+            serializer_wear = AchievementSerializer(wear)
+            return Response(
+                {"유저": serializer.data, "칭호": serializer_wear.data},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"유저": serializer.data, "칭호": "null"},
+                status=status.HTTP_200_OK,
+            )
 
     def patch(self, request, user_id):
         """회원정보 수정
@@ -111,7 +119,6 @@ class AchievementView(APIView):
     """칭호 관리
 
     전체 칭호를 보고 보유하고 있는 칭호 확인
-    보유하고 있는 칭호 중 원하는 칭호로 교체
     """
 
     def get(self, request, achieve_id):

@@ -16,6 +16,7 @@ django-cors-headers = "^4.0.0"
 python-dotenv = "^1.0.0"
 pillow = "^9.5.0"
 djangorestframework-simplejwt = "^5.2.2"
+django-allauth = "0.51.0"
 requests = "^2.31.0"
 bs4 = "^0.0.1"
 selenium = "^4.9.1"
@@ -23,6 +24,7 @@ channels = {extras = ["daphne"], version = "^4.0.0"}
 redis = "^4.5.5"
 channels-redis = "^4.1.0"
 django-redis = "^5.2.0"
+dj-rest-auth = "^4.0.1"
 
 
 [build-system]
