@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "users",
     "quizzes",
+    "battle",
     "crawled_data",
     "corsheaders",
     "django.contrib.sites",
@@ -92,6 +94,35 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# ASGI
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                (os.environ.get("BACKEND_HOST"), os.environ.get("CHANNEL_LAYER_PORT"))
+            ],
+        },
+    },
+}
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": os.path.join(
+#             "redis://",
+#             os.environ.get("USERNAME"),
+#             ":",
+#             os.environ.get("PASSWORD"),
+#             "@",
+#             os.environ.get("BACKEND_HOST"),
+#             ":",
+#             os.environ.get("CACHES_PORT"),
+#         ),
+#     }
+# }
+
 LOGIN_REDIRECT_URL = (
     "http://"
     + os.environ.get("FRONTEND_HOST")
@@ -102,9 +133,12 @@ LOGIN_REDIRECT_URL = (
 
 # REST_FRAMEWORK
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
 }
 
 
@@ -172,6 +206,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 SIMPLE_JWT = {
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.CustomTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=720),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": False,
@@ -197,8 +232,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 SITE_ID = 1
 

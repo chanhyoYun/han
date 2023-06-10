@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: redis
+    image: redis:7.0.11
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
