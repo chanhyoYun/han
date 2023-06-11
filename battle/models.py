@@ -40,7 +40,8 @@ class BattleHistory(models.Model):
 
     Attributes:
         btl_category (ForeignKey) : 배틀 종류
-        user =
+
+        user
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
