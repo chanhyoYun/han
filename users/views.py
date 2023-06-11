@@ -23,6 +23,7 @@ class UserView(APIView):
             status 201 : "가입완료" 메세지 반환, 회원 가입
             status 400 : 입력값 에러, (serializer.errors)메세지 반환
         """
+        print(request)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
