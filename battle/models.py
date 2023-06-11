@@ -21,15 +21,33 @@ class CurrentBattleList(models.Model):
         opponent_user (ForeignKey) : 상대방 유저
     """
 
-    btl_title = models.CharField(max_length=255)
+    btl_title = models.CharField(max_length=255, unique=True)
     btl_created_at = models.DateTimeField(auto_now_add=True)
     btl_updated_at = models.DateTimeField(auto_now=True)
-    host_user = models.ForeignKey(
+    host_user = models.OneToOneField(
         User, related_name="host_user", on_delete=models.CASCADE
     )
-    opponent_user = models.ForeignKey(
-        User, related_name="opponent_user", null=True, on_delete=models.CASCADE
+    max_users = models.IntegerField(default=2)
+    is_public = models.BooleanField(null=False, default=False)
+    room_password = models.IntegerField(null=True)
+
+
+class BattleUser(models.Model):
+    """배틀 참가자
+
+    각 방 별 참가자 리스트입니다.
+
+    Attributes:
+        btl (Foreign Key) : 방 번호
+
+        participant (Foreign Key) : 참가자
+    """
+
+    btl = models.ForeignKey(
+        CurrentBattleList, related_name="battle_room_id", on_delete=models.CASCADE
     )
+    participant = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_host = models.BooleanField(null=False, default=False)
 
 
 class BattleHistory(models.Model):
