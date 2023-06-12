@@ -2,7 +2,6 @@ from django.db import models
 from users.models import User
 
 
-# Create your models here.
 class CurrentBattleList(models.Model):
     """생성된 배틀 리스트 모델
 
@@ -18,17 +17,28 @@ class CurrentBattleList(models.Model):
 
         host_user (ForeignKey) : 호스트 유저
 
-        opponent_user (ForeignKey) : 상대방 유저
+        max_users (IntegerField) : 최대 인원
+
+        is_private (BooleanField) : 비공개방 여부
+
+        room_password (IntegerField) : 비공개방 비밀번호
     """
 
-    btl_title = models.CharField(max_length=255, unique=True)
+    btl_category_choices = (
+        ("A", "종합"),
+        ("C", "십자말풀이"),
+        ("D", "단어맞추기"),
+    )
+
+    btl_title = models.CharField(max_length=60, unique=True)
+    btl_category = models.CharField(max_length=5, choices=btl_category_choices)
     btl_created_at = models.DateTimeField(auto_now_add=True)
     btl_updated_at = models.DateTimeField(auto_now=True)
     host_user = models.OneToOneField(
         User, related_name="host_user", on_delete=models.CASCADE
     )
     max_users = models.IntegerField(default=2)
-    is_public = models.BooleanField(null=False, default=False)
+    is_private = models.BooleanField(null=False, default=False)
     room_password = models.IntegerField(null=True)
 
 
@@ -41,6 +51,8 @@ class BattleUser(models.Model):
         btl (Foreign Key) : 방 번호
 
         participant (Foreign Key) : 참가자
+
+        is_host (BooleanField) : 참가자 방장 여부
     """
 
     btl = models.ForeignKey(

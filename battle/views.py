@@ -114,7 +114,16 @@ class GameDetailView(APIView):
         Returns:
             status 200 : 현재 존재하는 방 리스트 리턴
         """
-        pass
+        room = get_object_or_404(CurrentBattleList, id=room_id)
+        if room.host_user != request.user:
+            return Response(
+                {"message": "방장만 방을 수정할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN
+            )
+        else:
+            serializer = BattleCreateSerializer(room, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "방이 수정되었습니다."}, status.HTTP_202_ACCEPTED)
 
     def delete(self, request, room_id):
         """방 삭제하기
@@ -131,7 +140,7 @@ class GameDetailView(APIView):
             return Response(
                 {"message": "방장만 방을 삭제할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN
             )
-        elif room.battle_room_id.count() == 1:
+        elif room.battle_room_id.count() > 1:
             return Response(
                 {"message": "참가자가 있을 때는 방을 삭제할 수 없습니다."},
                 status=status.HTTP_403_FORBIDDEN,
