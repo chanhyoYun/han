@@ -13,6 +13,7 @@ urlpatterns = [
     path(
         "achieve/<int:achieve_id>/", views.AchievementView.as_view(), name="achievement"
     ),
+    path("ranking/", views.RankingView.as_view(), name="ranking"),
     # 구글 소셜로그인
     path("google/login/", social.google_login, name="google_login"),
     path("google/callback/", social.google_callback, name="google_callback"),

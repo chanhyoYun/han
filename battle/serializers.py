@@ -9,7 +9,7 @@ class BattleParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = BattleUser
         fields = [
-            "btl",
+            # "btl",
             "participant",
             "is_host",
         ]
@@ -18,6 +18,7 @@ class BattleParticipantSerializer(serializers.ModelSerializer):
 class BattleListSerializer(serializers.ModelSerializer):
     host_user = serializers.StringRelatedField()
     participants = serializers.SerializerMethodField()
+    btl_category = serializers.CharField(source="get_btl_category_display")
 
     def get_participants(self, obj):
         return obj.battle_room_id.count()
@@ -27,10 +28,13 @@ class BattleListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "btl_title",
+            "btl_category",
             "host_user",
             "btl_created_at",
             "btl_updated_at",
             "participants",
+            "max_users",
+            "is_private",
         ]
 
 
@@ -43,7 +47,11 @@ class BattleDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "btl_title",
+            "btl_category",
             "host_user",
+            "max_users",
+            "is_private",
+            "room_password",
             "btl_created_at",
             "btl_updated_at",
             "participant_list",
@@ -55,4 +63,8 @@ class BattleCreateSerializer(serializers.ModelSerializer):
         model = CurrentBattleList
         fields = [
             "btl_title",
+            "btl_category",
+            "max_users",
+            "is_private",
+            "room_password",
         ]

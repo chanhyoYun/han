@@ -51,14 +51,3 @@ class QuizReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizReport
         fields = ("content",)
-
-
-class QuizPKserializer(serializers.ModelSerializer):
-    """퀴즈 시리얼라이저
-
-    퀴즈를 제안 받을때 사용됩니다.
-    """
-
-    class Meta:
-        model = Quiz
-        fields = ("pk",)
