@@ -13,6 +13,7 @@ django.setup()
 
 from crawled_data.models import KrDictQuiz, KrDictQuizExample, KrDictQuizExplain
 
+# 파일 바뀔 때 마다 경로 바꿔서 설정
 with open(
     "F:/nbc/final_project/전체 내려받기_한국어기초사전_JSON_20230612/1079331_51959.json",
     "r",
