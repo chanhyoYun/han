@@ -5,7 +5,6 @@ from rest_framework import status, permissions
 from rest_framework.generics import get_object_or_404
 from users.models import User, Achievement
 from rest_framework_simplejwt.views import TokenObtainPairView
-from users.serializers import CustomTokenObtainPairSerializer
 
 
 class UserView(APIView):
@@ -128,7 +127,3 @@ class AchievementView(APIView):
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer

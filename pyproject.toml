@@ -25,6 +25,7 @@ redis = "^4.5.5"
 channels-redis = "^4.1.0"
 django-redis = "^5.2.0"
 dj-rest-auth = "^4.0.1"
+daphne = "^4.0.0"
 
 
 [build-system]
