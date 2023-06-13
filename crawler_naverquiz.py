@@ -18,7 +18,7 @@ import django
 
 django.setup()
 
-from crawled_data.models import WordQuiz, WordQuizOption
+from crawled_data.models import NaverQuiz, NaverQuizOption
 
 
 def crawled_quiz():
@@ -143,12 +143,12 @@ def crawled_quiz():
 if __name__ == "__main__":
     quiz_data = crawled_quiz()
     for quiz in quiz_data:
-        my_quiz = WordQuiz(
+        my_quiz = NaverQuiz(
             title=quiz["title"], explain=quiz["explain"], rate=quiz["rate"]
         )
         my_quiz.save()
         for option in quiz["option"]:
-            quiz_option = WordQuizOption(
+            quiz_option = NaverQuizOption(
                 quiz=my_quiz, content=option["content"], is_answer=option["is_answer"]
             )
             quiz_option.save()
