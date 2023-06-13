@@ -54,3 +54,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["username"] = user.username
         return token
+
+
+class RankingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "image",
+            "experiment",
+            "level",
+            "day",
+            "wear_achievement",
+            "achieve",
+        ]
