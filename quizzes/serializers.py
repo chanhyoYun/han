@@ -2,7 +2,7 @@ from rest_framework import serializers
 from quizzes.models import Quiz, Option, QuizReport
 
 
-class QuizSerializer(serializers.ModelSerializer):
+class QuizSuggestSerializer(serializers.ModelSerializer):
     """퀴즈 시리얼라이저
 
     퀴즈를 제안 받을때 사용됩니다.
@@ -28,7 +28,7 @@ class OptionSerializer(serializers.ModelSerializer):
         )
 
 
-class QuizGetSerializer(serializers.ModelSerializer):
+class QuizSerializer(serializers.ModelSerializer):
     """퀴즈 제공 시리얼라이저
 
     퀴즈를 제공할때 사용됩니다.
@@ -40,6 +40,16 @@ class QuizGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = "__all__"
+
+
+class QuizResultSerializer(serializers.Serializer):
+    """퀴즈 결과 시리얼라이저
+
+    퀴즈풀이 결과를 받을때 사용됩니다.
+    """
+
+    id = serializers.IntegerField()
+    solved = serializers.BooleanField()
 
 
 class QuizReportSerializer(serializers.ModelSerializer):
