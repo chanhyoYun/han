@@ -8,6 +8,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from users.serializers import CustomTokenObtainPairSerializer
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
 class UserView(APIView):
     """회원가입
 
@@ -128,10 +132,6 @@ class AchievementView(APIView):
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
 
 class RankingView(ListAPIView):
