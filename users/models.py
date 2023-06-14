@@ -45,8 +45,9 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
 
     image = models.ImageField(blank=True)
+    level = models.PositiveIntegerField(default=1)
     experiment = models.PositiveIntegerField(default=0)
-    level = models.PositiveIntegerField(default=0)
+    max_experiment = models.IntegerField(default=100)
     day = models.PositiveIntegerField(default=0)
 
     achieve = models.ManyToManyField("Achievement", blank=True, verbose_name="achieves")

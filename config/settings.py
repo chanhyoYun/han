@@ -226,7 +226,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
-SITE_ID = 1
+SITE_ID = 2
 
 REST_USE_JWT = True
 
