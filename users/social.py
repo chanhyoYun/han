@@ -14,6 +14,7 @@ from allauth.socialaccount.providers.naver import views as naver_view
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from users.customtoken import CustomAccessToken, CustomRefreshToken
 
 state = os.environ.get("STATE")
 BASE_URL = "http://127.0.0.1:5500/"
@@ -97,8 +98,8 @@ class GoogleLogin(SocialLoginView):
             return Response({"message": "구글 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
-        access_token = AccessToken.for_user(user)
-        refresh_token = RefreshToken.for_user(user)
+        access_token = CustomAccessToken.for_user(user)
+        refresh_token = CustomRefreshToken.for_user(user)
 
         return Response(
             {"refresh": str(refresh_token), "access": str(access_token)},
@@ -185,8 +186,8 @@ class KakaoLogin(SocialLoginView):
             return JsonResponse({"message": "카카오 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
-        access_token = AccessToken.for_user(user)
-        refresh_token = RefreshToken.for_user(user)
+        access_token = CustomAccessToken.for_user(user)
+        refresh_token = CustomRefreshToken.for_user(user)
 
         return Response(
             {"refresh": str(refresh_token), "access": str(access_token)},
@@ -271,8 +272,8 @@ class NaverLogin(SocialLoginView):
             return JsonResponse({"message": "네이버 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
-        access_token = AccessToken.for_user(user)
-        refresh_token = RefreshToken.for_user(user)
+        access_token = CustomAccessToken.for_user(user)
+        refresh_token = CustomRefreshToken.for_user(user)
 
         return Response(
             {"refresh": str(refresh_token), "access": str(access_token)},
