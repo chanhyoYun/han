@@ -4,6 +4,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from battle.models import CurrentBattleList
 from channels.consumer import async_to_sync
 from asgiref.sync import sync_to_async
+from urllib.parse import parse_qs
+from jwt import decode as jwt_decode
+from django.conf import settings
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -19,7 +22,11 @@ class BattleConsumer(AsyncWebsocketConsumer):
             self.room_name (str): 프론트엔드에서 전달받은 룸 이름
             self.room_group_name (str): 동일한 메세지를 전달받을 그룹
         """
-        print(self.scope)
+        self.user = jwt_decode(
+            self.scope["cookies"]["access_token"],
+            settings.SECRET_KEY,
+            algorithms=["HS256"],
+        )["username"]
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
 
@@ -43,7 +50,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = text_data_json["roomData"]["host"]
         message = text_data_json["message"]
-        print(text_data_json)
 
         # 그룹에게 같은 메세지 전달
         await self.channel_layer.group_send(
