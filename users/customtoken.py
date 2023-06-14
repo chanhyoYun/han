@@ -7,7 +7,6 @@ class CustomToken(Token):
         token = super().for_user(user)
         token["email"] = user.email
         token["username"] = user.username
-
         return token
 
 

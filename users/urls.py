@@ -3,8 +3,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from users.views import CustomTokenObtainPairView
 from users import views, social
+from users.views import CustomTokenObtainPairView
 
 urlpatterns = [
     path("login/", CustomTokenObtainPairView.as_view(), name="login"),
