@@ -67,6 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        validated_data["is_active"] = False
         user = super().create(validated_data)
         password = user.password
         user.set_password(password)

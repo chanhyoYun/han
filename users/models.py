@@ -29,7 +29,6 @@ class MyUserManager(BaseUserManager):
             password=password,
         )
         user.is_admin = True
-        user.is_active = True
         user.save(using=self._db)
         return user
 
@@ -42,7 +41,7 @@ class User(AbstractBaseUser):
     )
 
     username = models.CharField(max_length=255, blank=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
     image = models.ImageField(blank=True)
