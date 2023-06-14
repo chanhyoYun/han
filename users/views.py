@@ -16,6 +16,10 @@ from django.utils.http import urlsafe_base64_decode
 from users.customtoken import user_email_verify_token
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
 class UserView(APIView):
     """회원가입
 
@@ -200,10 +204,6 @@ class AchievementView(APIView):
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
 
 class RankingView(ListAPIView):
