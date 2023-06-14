@@ -11,6 +11,10 @@ from django.http import JsonResponse
 import jwt
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
 class UserView(APIView):
     """회원가입
 
@@ -131,31 +135,6 @@ class AchievementView(APIView):
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            print(serializer.data)
-            # print(user_email)
-
-            # JWT 토큰 생성 및 쿠키 설정
-            access_token = jwt.encode(
-                {"user_email": user_email},
-                os.environ.get("SECRET_KEY"),
-                algorithm=os.environ.get("ALGORITHM"),
-            ).decode("utf-8")
-            response.set_cookie("access_token", access_token)
-
-            return response
-        else:
-            return Response(
-                {"message": "회원정보가 맞지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED
-            )
 
 
 class RankingView(ListAPIView):
