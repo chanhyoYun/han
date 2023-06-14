@@ -1,13 +1,11 @@
 from quizzes.models import Quiz
-from quizzes.serializers import QuizPKserializer
 import random
 
 
 class QuizGenerator:
     def generate():
-        quiz_objects = Quiz.objects.all()
-        serializer = QuizPKserializer(quiz_objects, many=True)
-        id_list = [x["pk"] for x in serializer.data]
+        quiz_objects_ids = Quiz.objects.values_list("id", flat=True)
+        id_list = list(quiz_objects_ids)
 
         generate_count = 10
 
