@@ -19,9 +19,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
             self.room_name (str): 프론트엔드에서 전달받은 룸 이름
             self.room_group_name (str): 동일한 메세지를 전달받을 그룹
         """
-        print(self.scope)
+        self.user = self.scope["user"]
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
+        print(self.user)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 

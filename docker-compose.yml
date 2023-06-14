@@ -14,3 +14,18 @@ services:
       - "mode=standalone"
     restart: always
     command: redis-server /usr/local/conf/redis.conf
+
+  # redis-cache:
+  #   container_name: redis-cache-server
+  #   image: redis:7.0.11
+  #   ports:
+  #     - 6380:6380
+  #   volumes:
+  #     - ./redis-cache-server/data:/data
+  #     - ./redis-cache-server/conf/redis.conf:/usr/local/conf/redis.conf
+  #   labels:
+  #     - "name=redis"
+  #     - "mode=standalone"
+  #   restart: always
+  #   command: redis-server /usr/local/conf/redis.conf
+    

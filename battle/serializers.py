@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from battle.models import CurrentBattleList, BattleUser
 from users.models import User
+from users.serializers import UserSerializer
 
 
 class BattleParticipantSerializer(serializers.ModelSerializer):
-    participant = serializers.StringRelatedField()
+    participant = UserSerializer()
 
     class Meta:
         model = BattleUser
@@ -35,12 +36,14 @@ class BattleListSerializer(serializers.ModelSerializer):
             "participants",
             "max_users",
             "is_private",
+            "room_password",
         ]
 
 
 class BattleDetailSerializer(serializers.ModelSerializer):
     host_user = serializers.StringRelatedField()
     participant_list = BattleParticipantSerializer(many=True, source="battle_room_id")
+    btl_category = serializers.CharField(source="get_btl_category_display")
 
     class Meta:
         model = CurrentBattleList

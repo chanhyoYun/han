@@ -29,7 +29,7 @@ class CurrentBattleList(models.Model):
         ("C", "십자말풀이"),
         ("D", "단어맞추기"),
     )
-
+    
     btl_title = models.CharField(max_length=60, unique=True)
     btl_category = models.CharField(max_length=5, choices=btl_category_choices)
     btl_created_at = models.DateTimeField(auto_now_add=True)
