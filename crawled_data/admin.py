@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import WordQuiz, WordQuizOption
+from .models import *
 
-admin.site.register(WordQuiz)
-admin.site.register(WordQuizOption)
+admin.site.register(NaverQuiz)
+admin.site.register(NaverQuizOption)
+admin.site.register(KrDictQuiz)
+admin.site.register(KrDictQuizExplain)
+admin.site.register(KrDictQuizExample)
