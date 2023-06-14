@@ -107,15 +107,15 @@ CHANNEL_LAYERS = {
     },
 }
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://"
-#         + os.environ.get("BACKEND_HOST")
-#         + ":"
-#         + os.environ.get("CACHES_PORT"),
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://"
+        + os.environ.get("BACKEND_HOST")
+        + ":"
+        + os.environ.get("CACHES_PORT"),
+    }
+}
 
 LOGIN_REDIRECT_URL = (
     "http://"

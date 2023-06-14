@@ -22,7 +22,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
-        print(self.user)
+        # print(self.user)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
@@ -44,7 +44,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = text_data_json["roomData"]["host"]
         message = text_data_json["message"]
-        print(text_data_json)
+        # print(text_data_json)
 
         # 그룹에게 같은 메세지 전달
         await self.channel_layer.group_send(
