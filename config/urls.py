@@ -24,6 +24,7 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("battle/", include("battle.urls")),
     path("", include("quizzes.urls")),
+    path("DB/", include("crawled_data.urls")),
     # 소셜
     path("users/", include("allauth.urls")),
 ]
