@@ -9,6 +9,36 @@ from users.models import User, Achievement
 from users.customtoken import user_email_verify_token
 
 
+def password_maker():
+    """임시 비밀번호 생성기
+
+    Returns:
+        new password : 랜덤으로 영문+숫자 6개 조합의 문자열을 뱉음
+    """
+    random_str = string.ascii_letters + string.digits
+    return "".join(random.choice(random_str) for _ in range(6))
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def update(self, instance, validated_data):
+        password = password_maker()
+        instance.set_password(password)
+        instance.save()
+
+        to_email = instance.email
+        email = EmailMessage(
+            "<한> 계정 비밀번호 초기화",
+            f"변경 된 임시 비밀번호는 {password}입니다. \n\n로그인 후 반드시 회원정보에서 비밀번호를 변경해주세요.",
+            to=[to_email],
+        )
+        email.send()
+        return instance
+
+
 class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
