@@ -1,14 +1,19 @@
 from rest_framework.views import APIView
-from users.serializers import UserSerializer, AchievementSerializer, RankingSerializer
+from users.serializers import (
+    UserSerializer,
+    AchievementSerializer,
+    RankingSerializer,
+    PasswordResetSerializer,
+)
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.generics import get_object_or_404, ListAPIView
 from users.models import User, Achievement
 from rest_framework_simplejwt.views import TokenObtainPairView
 from users.serializers import CustomTokenObtainPairSerializer
-import os
-from django.http import JsonResponse
-import jwt
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from users.customtoken import user_email_verify_token
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -30,15 +35,79 @@ class UserView(APIView):
             status 201 : "가입완료" 메세지 반환, 회원 가입
             status 400 : 입력값 에러, (serializer.errors)메세지 반환
         """
-        print(request)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "가입완료"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "유저 인증 이메일을 전송했습니다."}, status=status.HTTP_201_CREATED
+            )
         else:
             return Response(
                 {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class EmailVerifyView(APIView):
+    """일반 유저 이메일 인증
+
+    일반 유저 가입 시 사용 가능한 이메일인지 확인해주는 뷰
+    """
+
+    def get(self, request, uidb64, token):
+        """일반 유저 이메일 인증
+
+        Args:
+            request : 클라이언트 요청
+            uidb64 : 인코딩 한 유저 아이디
+            token : 해당 유저의 토큰
+
+        Returns:
+            status 200 : 인증 완료 메세지 반환. 유저의 is_active가 True로 변환
+            status 400 : keyError 발생 메세지 반환.
+            status 401 : 인증 실패 메세지 반환. check_token 메소드를 통과하지 못함
+        """
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+            if user_email_verify_token.check_token(user, token):
+                User.objects.filter(pk=uid).update(is_active=True)
+                return Response(
+                    {"message": "이메일 인증이 완료되었습니다."}, status=status.HTTP_200_OK
+                )
+            return Response(
+                {"error": "이메일 인증에 실패했습니다."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        except KeyError:
+            return Response(
+                {"error": "KEY ERROR가 발생했습니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class PasswordResetView(APIView):
+    """비밀번호 초기화
+
+    일반 유저의 비밀번호를 초기화 시켜주는 뷰
+    """
+
+    def put(self, request):
+        """비밀번호 초기화
+
+        Args:
+            request : 비밀번호를 초기화 할 계정의 이메일
+
+        Returns:
+            status 200 : 임시 비밀번호로 초기화 완료
+            status 400 : 비밀번호 초기화에 실패
+        """
+        user = get_object_or_404(User, email=request.data.get("email"))
+        serializer = PasswordResetSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "비밀번호 초기화 이메일을 전송했습니다."}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailView(APIView):

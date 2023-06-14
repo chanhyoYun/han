@@ -14,6 +14,12 @@ urlpatterns = [
     path(
         "achieve/<int:achieve_id>/", views.AchievementView.as_view(), name="achievement"
     ),
+    path(
+        "verify/<str:uidb64>/<str:token>/",
+        views.EmailVerifyView.as_view(),
+        name="email_verify_view",
+    ),
+    path("reset/", views.PasswordResetView.as_view(), name="password_reset_view"),
     path("ranking/", views.RankingView.as_view(), name="ranking"),
     # 구글 소셜로그인
     path("google/login/", social.google_login, name="google_login"),
