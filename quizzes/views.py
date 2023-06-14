@@ -2,9 +2,10 @@ from rest_framework import status
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from quizzes.serializers import (
-    QuizSerializer,
+    QuizSuggestSerializer,
     OptionSerializer,
-    QuizGetSerializer,
+    QuizSerializer,
+    QuizResultSerializer,
     QuizReportSerializer,
 )
 from rest_framework.generics import get_object_or_404
@@ -16,7 +17,7 @@ class QuizView(APIView):
     """퀴즈 뷰
 
     get요청시 퀴즈를 제공합니다.
-    post요청시 퀴즈를 제안 받습니다.
+    post요청시 퀴즈결과를 받아 처리합니다.
     """
 
     def get(self, request):
@@ -28,19 +29,48 @@ class QuizView(APIView):
             정상 200: 퀴즈 데이터 제공
         """
         quiz = QuizGenerator.generate()
-        serializer = QuizGetSerializer(quiz, many=True)
+        serializer = QuizSerializer(quiz, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """퀴즈 뷰 post
 
-        퀴즈를 제안하는 요청을 받습니다.
+        퀴즈풀이 결과를 받아 처리합니다.
+        정답을 맞춘 문제를 세어 request유저의 경험치를 추가해줍니다.
+
+        Returns:
+            정상 200
+            오류 400: 올바르지 않은 입력
+            오류 401: 올바르지 않은 토큰
+        """
+        serializer = QuizResultSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            solved_quizzes = [x for x in serializer.data if x["solved"]]
+            earn_exp = 10 * len(solved_quizzes)
+
+            request.user.experiment += earn_exp
+            request.user.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuizSuggestView(APIView):
+    """퀴즈 제안 뷰
+
+    post요청시 퀴즈 제안을 받아 저장합니다.
+    """
+
+    def post(self, request):
+        """퀴즈 뷰 post
+
+        퀴즈를 제안하는 요청을 받아 저장합니다.
 
         Returns:
             정상 201: "제출완료" 메세지
             오류 400: 올바르지 않은 입력
         """
-        quiz_serializer = QuizSerializer(data=request.data["quiz"])
+        quiz_serializer = QuizSuggestSerializer(data=request.data["quiz"])
         if quiz_serializer.is_valid():
             save_quiz = quiz_serializer.save()
         else:
