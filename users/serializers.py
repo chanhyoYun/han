@@ -7,6 +7,8 @@ import random, string
 
 from users.models import User, Achievement, UserInfo
 from users.customtoken import user_email_verify_token
+from users.models import User
+from django.contrib.sessions.models import Session
 
 
 def password_maker():
@@ -135,6 +137,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["username"] = user.username
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        request = self.context["request"]
+        request.session.save()
+
+        data["session_data"] = request.session.session_key
+
+        return data
 
 
 class RankingSerializer(serializers.ModelSerializer):

@@ -6,7 +6,11 @@ from channels.consumer import async_to_sync
 from asgiref.sync import sync_to_async
 from urllib.parse import parse_qs
 from jwt import decode as jwt_decode
-from django.conf import settings
+from channels.db import database_sync_to_async
+from django.contrib.sessions.models import Session
+from django.core.cache import cache
+from redis import Redis
+import base64
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -14,6 +18,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     배틀 연결 및 연결 해제
     """
+
+    @database_sync_to_async
+    def get_session(self, session_key):
+        return Session.objects.get(session_key=session_key)
 
     async def connect(self):
         """웹소켓 연결
@@ -25,7 +33,12 @@ class BattleConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"].username
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
-
+        session_key = parse_qs(self.scope["query_string"].decode())["sessionKey"][0]
+        # session = await self.get_session(session_key)
+        r = Redis(host="localhost", port=6379, db=0)
+        encoded_data = r.get(session_key).decode()
+        # + "=" * (4 - len(r.get(session_key).decode()) % 4)
+        print(base64.b64decode(encoded_data))
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         # 웹소켓 연결 시점
