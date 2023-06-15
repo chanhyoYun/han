@@ -9,7 +9,7 @@ from quizzes.serializers import (
     QuizReportSerializer,
 )
 from rest_framework.generics import get_object_or_404
-from quizzes.models import Quiz
+from quizzes.models import UserQuiz
 from quizzes.generators import QuizGenerator
 from users.models import UserInfo
 from users.achieve import check_achieve
@@ -65,13 +65,13 @@ class QuizView(APIView):
 
 
 class QuizSuggestView(APIView):
-    """퀴즈 제안 뷰
+    """유저 퀴즈 제안 뷰
 
     post요청시 퀴즈 제안을 받아 저장합니다.
     """
 
     def post(self, request):
-        """퀴즈 뷰 post
+        """유저 퀴즈 뷰 post
 
         퀴즈를 제안하는 요청을 받아 저장합니다.
 
@@ -79,7 +79,10 @@ class QuizSuggestView(APIView):
             정상 201: "제출완료" 메세지
             오류 400: 올바르지 않은 입력
         """
-        quiz_serializer = QuizSuggestSerializer(data=request.data["quiz"])
+        user = request.user
+        quiz_data = request.data["quiz"]
+        quiz_data["user"] = user.id
+        quiz_serializer = QuizSuggestSerializer(data=quiz_data)
         if quiz_serializer.is_valid():
             save_quiz = quiz_serializer.save()
         else:
@@ -110,7 +113,7 @@ class QuizReportView(APIView):
             오류 400: 올바르지 않은 입력
             오류 404: 퀴즈 찾을수 없음
         """
-        quiz = get_object_or_404(Quiz, id=quiz_id)
+        quiz = get_object_or_404(UserQuiz, id=quiz_id)
         serializer = QuizReportSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(quiz=quiz, user=request.user)
