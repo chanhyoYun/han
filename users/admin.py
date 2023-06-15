@@ -50,6 +50,7 @@ class UserChangeForm(forms.ModelForm):
             "day",
             "wear_achievement",
             "achieve",
+            "followings",
         ]
 
 
@@ -73,6 +74,7 @@ class UserAdmin(BaseUserAdmin):
                     "day",
                     "wear_achievement",
                     "achieve",
+                    "followings",
                 ]
             },
         ),

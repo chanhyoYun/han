@@ -65,6 +65,8 @@ class UserSerializer(serializers.ModelSerializer):
             "day",
             "wear_achievement",
             "achieve",
+            "followings",
+            "followers",
         ]
 
     def create(self, validated_data):
