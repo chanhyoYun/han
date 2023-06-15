@@ -68,6 +68,7 @@ class UserAdmin(BaseUserAdmin):
                     "username",
                     "image",
                     "experiment",
+                    "max_experiment",
                     "level",
                     "day",
                     "wear_achievement",

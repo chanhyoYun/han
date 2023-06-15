@@ -60,6 +60,7 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "image",
             "experiment",
+            "max_experiment",
             "level",
             "day",
             "wear_achievement",
