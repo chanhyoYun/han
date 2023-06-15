@@ -20,6 +20,7 @@ urlpatterns = [
         name="email_verify_view",
     ),
     path("reset/", views.PasswordResetView.as_view(), name="password_reset_view"),
+    path("follow/<int:user_id>/", views.FollowView.as_view(), name="follow_view"),
     path("ranking/", views.RankingView.as_view(), name="ranking"),
     # 구글 소셜로그인
     path("google/login/", social.google_login, name="google_login"),

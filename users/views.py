@@ -206,6 +206,37 @@ class AchievementView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class FollowView(APIView):
+    """팔로우
+
+    유저끼리의 팔로우
+    """
+
+    def post(self, request, user_id):
+        """팔로우 완료, 취소
+
+        Args:
+            request : 로그인 한 유저 정보
+            user_id : 유저 고유 id값
+
+        Returns:
+            status 200 : 내 팔로잉 목록에 해당 유저 추가
+            status 204 : 내 팔로잉 목록에서 해당 유저 제거
+            status 205 : 자기 자신은 팔로우 할 수 없음
+        """
+        you = get_object_or_404(User, id=user_id)
+        me = request.user
+        if me != you:
+            if me in you.followers.all():
+                you.followers.remove(me)
+                return Response("팔로우 취소", status=status.HTTP_204_NO_CONTENT)
+            else:
+                you.followers.add(me)
+                return Response("팔로우 완료", status=status.HTTP_200_OK)
+        else:
+            return Response("자기 자신은 팔로우 불가합니다.", status=status.HTTP_205_RESET_CONTENT)
+
+
 class RankingView(ListAPIView):
     """랭킹 조회
 

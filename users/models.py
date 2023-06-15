@@ -53,6 +53,10 @@ class User(AbstractBaseUser):
     achieve = models.ManyToManyField("Achievement", blank=True, verbose_name="achieves")
     wear_achievement = models.IntegerField(default=-1)
 
+    followings = models.ManyToManyField(
+        "self", symmetrical=False, related_name="followers", blank=True
+    )
+
     objects = MyUserManager()
 
     USERNAME_FIELD = "email"
