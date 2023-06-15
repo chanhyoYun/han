@@ -1,5 +1,5 @@
 from django.contrib import admin
-from quizzes.models import Quiz, Option
+from quizzes.models import UserQuiz, UserQuizoption
 
-admin.site.register(Quiz)
-admin.site.register(Option)
+admin.site.register(UserQuiz)
+admin.site.register(UserQuizoption)

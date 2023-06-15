@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from quizzes.models import Quiz, Option, QuizReport
+from quizzes.models import *
 
 
 class QuizSuggestSerializer(serializers.ModelSerializer):
@@ -9,9 +9,9 @@ class QuizSuggestSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = Quiz
+        model = UserQuiz
         fields = "__all__"
-
+    
 
 class OptionSerializer(serializers.ModelSerializer):
     """보기 시리얼라이저
@@ -21,7 +21,7 @@ class OptionSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = Option
+        model = UserQuizoption
         fields = (
             "content",
             "is_answer",
@@ -38,7 +38,7 @@ class QuizSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True)
 
     class Meta:
-        model = Quiz
+        model = UserQuiz
         fields = "__all__"
 
 
