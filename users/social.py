@@ -15,6 +15,7 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from users.customtoken import CustomAccessToken, CustomRefreshToken
+from users.models import UserInfo
 
 state = os.environ.get("STATE")
 BASE_URL = "http://127.0.0.1:5500/"
@@ -70,12 +71,21 @@ def google_callback(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {
+            "access_token": access_token,
+            "code": code,
+            "email": email,
+            "log": False,
+        }
         return JsonResponse(data, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
-        data = {"access_token": access_token, "code": code}
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {
+            "access_token": access_token,
+            "code": code,
+            "email": email,
+            "log": True,
+        }
         return JsonResponse(data, status=status.HTTP_200_OK)
 
     except SocialAccount.DoesNotExist:
@@ -98,6 +108,10 @@ class GoogleLogin(SocialLoginView):
             return Response({"message": "구글 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
+
+        if request.data["log"]:
+            UserInfo.objects.create(player=user)
+
         access_token = CustomAccessToken.for_user(user)
         refresh_token = CustomRefreshToken.for_user(user)
 
@@ -165,11 +179,21 @@ def kakao_callback(request):
                 {"message": "카카오 소셜이 아닙니다. 계정을 확인해주세요."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {
+            "access_token": access_token,
+            "code": code,
+            "email": email,
+            "log": False,
+        }
         return Response(data, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {
+            "access_token": access_token,
+            "code": code,
+            "email": email,
+            "log": True,
+        }
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -186,6 +210,10 @@ class KakaoLogin(SocialLoginView):
             return JsonResponse({"message": "카카오 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
+
+        if request.data["log"]:
+            UserInfo.objects.create(player=user)
+
         access_token = CustomAccessToken.for_user(user)
         refresh_token = CustomRefreshToken.for_user(user)
 
@@ -251,11 +279,16 @@ def naver_callback(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         # 기존에 Google로 가입된 유저
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {
+            "access_token": access_token,
+            "code": code,
+            "email": email,
+            "log": False,
+        }
         return Response(data, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
-        data = {"access_token": access_token, "code": code, "email": email}
+        data = {"access_token": access_token, "code": code, "email": email, "log": True}
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -272,6 +305,10 @@ class NaverLogin(SocialLoginView):
             return JsonResponse({"message": "네이버 소셜 로그인 실패"}, status=accept_status)
 
         user = User.objects.get(email=request.data["email"])
+
+        if request.data["log"]:
+            UserInfo.objects.create(player=user)
+
         access_token = CustomAccessToken.for_user(user)
         refresh_token = CustomRefreshToken.for_user(user)
 

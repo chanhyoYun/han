@@ -11,6 +11,8 @@ from quizzes.serializers import (
 from rest_framework.generics import get_object_or_404
 from quizzes.models import Quiz
 from quizzes.generators import QuizGenerator
+from users.models import UserInfo
+from users.achieve import check_achieve
 
 
 class QuizView(APIView):
@@ -48,8 +50,15 @@ class QuizView(APIView):
             solved_quizzes = [x for x in serializer.data if x["solved"]]
             earn_exp = 10 * len(solved_quizzes)
 
-            request.user.experiment += earn_exp
-            request.user.save()
+            user_info = get_object_or_404(UserInfo, player_id=request.user.id)
+            user_info.experiment += earn_exp
+
+            if user_info.experiment >= user_info.max_experiment:
+                user_info.level += 1
+                user_info.experiment -= user_info.max_experiment
+                user_info.max_experiment += (user_info.level - 1) * 10
+            check_achieve(user_info)
+            user_info.save()
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

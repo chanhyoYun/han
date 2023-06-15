@@ -18,7 +18,6 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -43,12 +42,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=255, blank=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
     image = models.ImageField(blank=True)
-    level = models.PositiveIntegerField(default=1)
-    experiment = models.PositiveIntegerField(default=0)
-    max_experiment = models.IntegerField(default=100)
-    day = models.PositiveIntegerField(default=0)
 
     achieve = models.ManyToManyField("Achievement", blank=True, verbose_name="achieves")
     wear_achievement = models.IntegerField(default=-1)
@@ -74,3 +68,12 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+
+class UserInfo(models.Model):
+    player = models.ForeignKey(User, related_name="player", on_delete=models.CASCADE)
+    level = models.PositiveIntegerField(default=1)
+    experiment = models.PositiveIntegerField(default=0)
+    max_experiment = models.IntegerField(default=100)
+    day = models.PositiveIntegerField(default=0)
+    quizzes_count = models.PositiveIntegerField(default=0)

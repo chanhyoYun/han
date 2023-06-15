@@ -4,13 +4,14 @@ from users.serializers import (
     AchievementSerializer,
     RankingSerializer,
     PasswordResetSerializer,
+    UserInfoSerializer,
+    CustomTokenObtainPairSerializer,
 )
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.generics import get_object_or_404, ListAPIView
-from users.models import User, Achievement
+from users.models import User, Achievement, UserInfo
 from rest_framework_simplejwt.views import TokenObtainPairView
-from users.serializers import CustomTokenObtainPairSerializer
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from users.customtoken import user_email_verify_token
@@ -128,19 +129,24 @@ class UserDetailView(APIView):
         """
         user = get_object_or_404(User, id=user_id)
         serializer = UserSerializer(user)
-        # return Response(serializer.data, status=status.HTTP_200_OK)
+        user_info = get_object_or_404(UserInfo, player_id=user_id)
+        serializer_info = UserInfoSerializer(user_info)
         if serializer.data["wear_achievement"] != -1:
             wear = get_object_or_404(
                 Achievement, pk=serializer.data["wear_achievement"]
             )
             serializer_wear = AchievementSerializer(wear)
             return Response(
-                {"유저": serializer.data, "칭호": serializer_wear.data},
+                {
+                    "유저": serializer.data,
+                    "정보": serializer_info.data,
+                    "칭호": serializer_wear.data,
+                },
                 status=status.HTTP_200_OK,
             )
         else:
             return Response(
-                {"유저": serializer.data, "칭호": "null"},
+                {"유저": serializer.data, "정보": serializer_info.data, "칭호": "null"},
                 status=status.HTTP_200_OK,
             )
 
@@ -244,7 +250,7 @@ class RankingView(ListAPIView):
     """
 
     serializer_class = RankingSerializer
-    queryset = User.objects.all().order_by("-experiment")
+    # queryset = User.objects.all().order_by("-experiment")
 
     def get_queryset(self):
         """랭킹 조회
