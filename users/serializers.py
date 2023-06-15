@@ -5,7 +5,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 import random, string
 
-from users.models import User, Achievement
+from users.models import User, Achievement, UserInfo
 from users.customtoken import user_email_verify_token
 
 
@@ -59,10 +59,6 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "username",
             "image",
-            "experiment",
-            "max_experiment",
-            "level",
-            "day",
             "wear_achievement",
             "achieve",
             "followings",
@@ -74,6 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         password = user.password
         user.set_password(password)
+        UserInfo.objects.create(player=user)
         user.save()
 
         uidb64 = urlsafe_base64_encode(force_bytes(user.id))
@@ -112,9 +109,12 @@ class RankingSerializer(serializers.ModelSerializer):
         fields = [
             "username",
             "image",
-            "experiment",
-            "level",
-            "day",
             "wear_achievement",
             "achieve",
         ]
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserInfo
+        fields = "__all__"

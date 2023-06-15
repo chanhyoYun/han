@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from users.models import User, Achievement
+from users.models import User, Achievement, UserInfo
 
 
 class UserCreationForm(forms.ModelForm):
@@ -45,9 +45,6 @@ class UserChangeForm(forms.ModelForm):
             "is_admin",
             "username",
             "image",
-            "experiment",
-            "level",
-            "day",
             "wear_achievement",
             "achieve",
             "followings",
@@ -68,10 +65,6 @@ class UserAdmin(BaseUserAdmin):
                 "fields": [
                     "username",
                     "image",
-                    "experiment",
-                    "max_experiment",
-                    "level",
-                    "day",
                     "wear_achievement",
                     "achieve",
                     "followings",
@@ -104,3 +97,4 @@ class AchievementAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Achievement, AchievementAdmin)
+admin.site.register(UserInfo)
