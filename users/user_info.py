@@ -28,14 +28,18 @@ def check_user_info(serializer, user_id):
 
     # 유저 학습일수, 연속 학습일수 반영
     today = datetime.now()
-    user_attend = user.last_login - user_info.attend
+    last_login_date = datetime.strptime(str(user.last_login.date()), "%Y-%m-%d")
+    attend_date = datetime.strptime(str(user_info.attend.date()), "%Y-%m-%d")
+    
+    user_attend = last_login_date - attend_date
 
     if user_attend.days == 1:
         user_info.day += 1
     else:
         user_info.day = 1
 
-    if str(user_info.attend).split(" ")[0] != str(user.last_login).split(" ")[0]:
+    # 정상 학습시, 학습 시작일 오늘로 설정. 
+    if attend_date != last_login_date:
         user_info.total_study_day += 1
         user_info.attend = today
 
