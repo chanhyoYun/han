@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from dotenv import load_dotenv
 
 # dotenv에서 key값을 참조하기 때문에 dotenv를 load 해와야 함
@@ -22,7 +23,7 @@ with open(
     data = json.load(file)
 
 word_list = data["LexicalResource"]["Lexicon"]["LexicalEntry"]
-
+pattern = r"[^\w\s]"
 
 def kr_dict():
     word_data = []
@@ -37,6 +38,9 @@ def kr_dict():
                     my_word = item["feat"]["val"]
         else:
             my_word = lemma["feat"]["val"]
+        # 특수문자가 포함된 단어는 제외
+        if re.findall(pattern, my_word):
+            continue
 
         # explain과 example
         sense = word_list[i]["Sense"]
