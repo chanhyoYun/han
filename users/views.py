@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from users.serializers import (
     UserSerializer,
+    UserGetSerializer,
     AchievementSerializer,
     RankingSerializer,
     PasswordResetSerializer,
@@ -128,7 +129,7 @@ class UserDetailView(APIView):
             status 404 : 회원정보 없음
         """
         user = get_object_or_404(User, id=user_id)
-        serializer = UserSerializer(user)
+        serializer = UserGetSerializer(user)
         user_info = get_object_or_404(UserInfo, player_id=user_id)
         serializer_info = UserInfoSerializer(user_info)
         if serializer.data["wear_achievement"] != -1:
