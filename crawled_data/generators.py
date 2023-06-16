@@ -9,6 +9,7 @@ import numpy as np
 import re
 from kiwipiepy import Kiwi
 from tokenize import tokenize, untokenize
+from django.db.models import Count
 
 kiwi = Kiwi(model_type="sbg")
 
@@ -80,14 +81,38 @@ class QuizGenerator:
         pass
 
     def fill_in_the_blank(self, puzzle_count):
-        _maximum_explain = 2
+        """빈칸에 알맞은 말 맞추기
 
+        Args:
+            puzzle_count (int): 배정된 퍼즐 수
+
+        Returns:
+            serializer.data : 시리얼라이즈된 데이터 리턴
+        """
+
+        # 최대 예문 개수
+        _maximum_explain = 3
+
+        # 전체 설명문 개수 count
         all_quiz_count = KrDictQuizExplain.objects.all().count()
         all_quiz_array = range(0, all_quiz_count + 1)
-        random_num = random.sample(all_quiz_array, k=puzzle_count)
-        quiz = KrDictQuizExplain.objects.filter(id__in=random_num)
-        serializer = FillInTheBlankSerializer(quiz, many=True)
+        quiz = []
+        serializer = FillInTheBlankSerializer()
 
+        # 뽑은 샘플 중에 적합하지 않은 쿼리셋이 있을 경우 다시 뽑음
+        while len(quiz) < puzzle_count:
+            random_num = random.sample(all_quiz_array, k=puzzle_count)
+
+            # 샘플 중에 예문이 3개 미만인 경우 제외
+            quiz = (
+                KrDictQuizExplain.objects.filter(id__in=random_num)
+                .annotate(all_examples_sum=Count("dict_word__examples"))
+                .filter(all_examples_sum__gte=3)
+            )
+
+            serializer = FillInTheBlankSerializer(quiz, many=True)
+
+        # kiwi 라이브러리 이용 단어 구멍 뚫기
         for k in range(puzzle_count):
             right_answer = serializer.data[k]["dict_word"]["word"]
             right_answer_tokenizes = kiwi.tokenize(right_answer)
@@ -96,9 +121,6 @@ class QuizGenerator:
                 if rat.tag != "EF":
                     subtract_word.append(rat)
 
-            print(subtract_word)
-
-            # 단어 구멍 뚫기
             examples = serializer.data[k]["dict_word"]["examples"]
             emptyed_examples = list()
             for example in examples:
@@ -110,7 +132,6 @@ class QuizGenerator:
                             + "O" * te.len
                             + example["content"][te.start + te.len :]
                         )
-                        print(example["content"])
 
                 emptyed_examples.append(example)
 
@@ -123,11 +144,10 @@ class QuizGenerator:
             checked_list = list()
             count = 0
             _max_count = 100
-            while len(examples_list) < _maximum_explain + 1 and count < _max_count + 1:
+            while len(examples_list) < _maximum_explain and count < _max_count + 1:
                 ran_num = random.randint(0, len(all_examples) - 1)
 
                 if ran_num not in checked_list:
-                    print(ran_num)
                     checked_list.append(ran_num)
 
                 picked_example = all_examples[ran_num]["content"]
