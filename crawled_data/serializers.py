@@ -41,3 +41,22 @@ class KrDictQuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = KrDictQuiz
         fields = "__all__"
+
+
+class KrDictSerializer(serializers.ModelSerializer):
+    examples = KrDictExampleSerializer(many=True)
+
+    class Meta:
+        model = KrDictQuiz
+        fields = "__all__"
+
+
+class FillInTheBlankSerializer(serializers.ModelSerializer):
+    dict_word = KrDictSerializer()
+
+    class Meta:
+        model = KrDictQuizExplain
+        fields = [
+            "dict_word",
+            "content",
+        ]

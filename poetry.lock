@@ -389,6 +389,18 @@ files = [
 ]
 
 [[package]]
+name = "colorama"
+version = "0.4.6"
+description = "Cross-platform colored terminal text."
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+files = [
+    {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
+    {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
 name = "constantly"
 version = "15.1.0"
 description = "Symbolic constants in Python"
@@ -461,6 +473,18 @@ twisted = {version = ">=22.4", extras = ["tls"]}
 
 [package.extras]
 tests = ["django", "hypothesis", "pytest", "pytest-asyncio"]
+
+[[package]]
+name = "dataclasses"
+version = "0.6"
+description = "A backport of the dataclasses module for Python 3.6"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dataclasses-0.6-py3-none-any.whl", hash = "sha256:454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f"},
+    {file = "dataclasses-0.6.tar.gz", hash = "sha256:6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84"},
+]
 
 [[package]]
 name = "defusedxml"
@@ -816,6 +840,72 @@ cryptography = ">=3.4"
 deprecated = "*"
 
 [[package]]
+name = "kiwipiepy"
+version = "0.15.2"
+description = "Kiwi, the Korean Tokenizer for Python"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "kiwipiepy-0.15.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:7575fc7b0290c7d8257d4d4340cc1828cbcd2145cbd09e504f1b27946209c80e"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:b7459082bf681b5e52eccd12d891c2274c647af939be6c7d4c098e08cb9f9f05"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a911de8962112fc9255b4ba5871385d70645c20a774f2fe41ba929f4056901d7"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:2197b59b0e28942d9eb70692611c20de7df681a8f0c55101a8333d8332b6dfc8"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:42d16e5f15d3911f4719b1c125ca54027d3b3182507e00314e6a75bbc8f758bf"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-win32.whl", hash = "sha256:bb42ffeb00c412ad0d2433bf44cb87da4dc703aabe8a30cd98071d0f9cf543f1"},
+    {file = "kiwipiepy-0.15.2-cp310-cp310-win_amd64.whl", hash = "sha256:612417b7927898af26a94d1783fbd931da2db8b1da70f6872b8d5204a0c3a93a"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:e839145aceb41a5f03000ca3871bd1b86a4bea152ed10dcf14eeaa5768f356b9"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:be1496c92aaf477a3b5a92de11bb47d815c9955c6b3284792c46e0fbaf494a9a"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e715f7582ddcd10893d0a095a1e43498a283023f33f724318b9ddb1c08e1e7d9"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:22e50935f3dee3c35c4053f8018d9d970932ca0eb419d21fac090cdc7a561c6c"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f3c01f53881fcf50e6bb8f43c33654742b5e93abc46e28b5cfb13dd46aa47e82"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-win32.whl", hash = "sha256:0d82b346725b72cb1372d2933075afa524fb717118288629eedf7a6b0aaae4bd"},
+    {file = "kiwipiepy-0.15.2-cp311-cp311-win_amd64.whl", hash = "sha256:d475b7e59e25e87b5282f0099fd95adced5175abdd30622ee91d85c3af433c4d"},
+    {file = "kiwipiepy-0.15.2-cp36-cp36m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:fbfe5b73aa2b6d5e59e42d4d233ac8716abe556d5e83a95fb5c110750258a484"},
+    {file = "kiwipiepy-0.15.2-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bb3e27113d56d9592f8e5bde7f498695f25b73176688e393466b7f9336b6e793"},
+    {file = "kiwipiepy-0.15.2-cp36-cp36m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:52fb67ea76efeebd8ae22ebd744a2a858ad78f471d68884c20e8c2e2e8923c73"},
+    {file = "kiwipiepy-0.15.2-cp36-cp36m-win32.whl", hash = "sha256:3819ceadfbf06afa309cf1f499e24a7c8a42a073470c2d0921f3e9a092671c2f"},
+    {file = "kiwipiepy-0.15.2-cp36-cp36m-win_amd64.whl", hash = "sha256:6755780df1359a37f7557296b8f680a15801264aca83f5c12a0639689a0376f1"},
+    {file = "kiwipiepy-0.15.2-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:83d47fafa51f99f2acbf6f5680eb20b1271fb8081f2456a23f0d0fa4fb4b3f67"},
+    {file = "kiwipiepy-0.15.2-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:676a4bd5ac9ead26d87ff4ba194fa3070efd48ba960013bd80f13d2e4fc0dee6"},
+    {file = "kiwipiepy-0.15.2-cp37-cp37m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:06e644be488d832246b188715bd54a66f5766399dd99db0f32eb8c4367e3da1a"},
+    {file = "kiwipiepy-0.15.2-cp37-cp37m-win32.whl", hash = "sha256:f9455fcc4498457cd076577a6d48ba8dcfea1cff339446253e0eac111433a4bd"},
+    {file = "kiwipiepy-0.15.2-cp37-cp37m-win_amd64.whl", hash = "sha256:d824c0862dd41d254b221a5df4b6dfc40bde73d2e11c6f7457aff07a121ccec2"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:1c09da6e5c0b4fb3ea528bdf3fe3cab38dbca09e379fccac9b12df26072d29a0"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:1f8adb969dc5580eeba1155d84b9bc1f67c36015587e1ebae58af35adc860150"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:7af7216b7ba77d2bf9b1fefa2666a13f877658ffe1a5d1a58d56f488db5d5557"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:423d9b1368ca5eb86ee78784b6e126fe1db5f4688e6897425f109a8ba880b9d8"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:63e127a16ef8c82d642836b2a699377346dc2c7effc1523e2276447bcd2ac2bc"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-win32.whl", hash = "sha256:a08624ec7e05f0f3e893bc36acecbbd8538b88f2b1713fa5b3b5c0167ef5929e"},
+    {file = "kiwipiepy-0.15.2-cp38-cp38-win_amd64.whl", hash = "sha256:cdaeeeadda9564c27afe321dd5b63bf8d5c127e2f564bb8d74fcbdc56e2dbd21"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:71aad8e4e568301ca14b3f7c9aa728d9df1e4bcedffca539ad3e671cff37ce8e"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-macosx_11_0_x86_64.whl", hash = "sha256:e81a2eacaa0626eaef0f60e47a330cfa032d4767dffa64e2adaf5e5ed2973432"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:52c14eb52a1575e18b3a93f6097fe42044bdd920d725e13d08b22d96d8013861"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:75a1442854f1de35e225de5320c4918f34d8840ad18bfbd3d3eee87e806bc0c4"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:d2e8e3372fc715db91c4e5e6b0f0bbef396fff2bc5c7e17e226830177187f983"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-win32.whl", hash = "sha256:85944db53a099245c1079f65ad349de18510f78cf72a41247e3d329205a3e4e3"},
+    {file = "kiwipiepy-0.15.2-cp39-cp39-win_amd64.whl", hash = "sha256:02d46e2b0754270913d4c7a095374dd9e73e71c0feca02243bea3d7df446b06e"},
+    {file = "kiwipiepy-0.15.2.tar.gz", hash = "sha256:e315df12409bb99d9622a26c51b722451187c7ae30ea07a8ba66f6a8b02a3de7"},
+]
+
+[package.dependencies]
+dataclasses = "*"
+kiwipiepy-model = ">=0.15,<1.0"
+numpy = "*"
+tqdm = "*"
+
+[[package]]
+name = "kiwipiepy-model"
+version = "0.15.0"
+description = "Model for kiwipiepy"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "kiwipiepy_model-0.15.0.tar.gz", hash = "sha256:d61b935c2a1e87f466a29171a338d02bb4404cafe854bc5a3bcdcdba8bfcd6ea"},
+]
+
+[[package]]
 name = "markdown"
 version = "3.4.3"
 description = "Python implementation of John Gruber's Markdown."
@@ -904,6 +994,44 @@ files = [
     {file = "msgpack-1.0.5-cp39-cp39-win32.whl", hash = "sha256:ac9dd47af78cae935901a9a500104e2dea2e253207c924cc95de149606dc43cc"},
     {file = "msgpack-1.0.5-cp39-cp39-win_amd64.whl", hash = "sha256:06f5174b5f8ed0ed919da0e62cbd4ffde676a374aba4020034da05fab67b9164"},
     {file = "msgpack-1.0.5.tar.gz", hash = "sha256:c075544284eadc5cddc70f4757331d99dcbc16b2bbd4849d15f8aae4cf36d31c"},
+]
+
+[[package]]
+name = "numpy"
+version = "1.24.3"
+description = "Fundamental package for array computing in Python"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "numpy-1.24.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:3c1104d3c036fb81ab923f507536daedc718d0ad5a8707c6061cdfd6d184e570"},
+    {file = "numpy-1.24.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:202de8f38fc4a45a3eea4b63e2f376e5f2dc64ef0fa692838e31a808520efaf7"},
+    {file = "numpy-1.24.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8535303847b89aa6b0f00aa1dc62867b5a32923e4d1681a35b5eef2d9591a463"},
+    {file = "numpy-1.24.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2d926b52ba1367f9acb76b0df6ed21f0b16a1ad87c6720a1121674e5cf63e2b6"},
+    {file = "numpy-1.24.3-cp310-cp310-win32.whl", hash = "sha256:f21c442fdd2805e91799fbe044a7b999b8571bb0ab0f7850d0cb9641a687092b"},
+    {file = "numpy-1.24.3-cp310-cp310-win_amd64.whl", hash = "sha256:ab5f23af8c16022663a652d3b25dcdc272ac3f83c3af4c02eb8b824e6b3ab9d7"},
+    {file = "numpy-1.24.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:9a7721ec204d3a237225db3e194c25268faf92e19338a35f3a224469cb6039a3"},
+    {file = "numpy-1.24.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d6cc757de514c00b24ae8cf5c876af2a7c3df189028d68c0cb4eaa9cd5afc2bf"},
+    {file = "numpy-1.24.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:76e3f4e85fc5d4fd311f6e9b794d0c00e7002ec122be271f2019d63376f1d385"},
+    {file = "numpy-1.24.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a1d3c026f57ceaad42f8231305d4653d5f05dc6332a730ae5c0bea3513de0950"},
+    {file = "numpy-1.24.3-cp311-cp311-win32.whl", hash = "sha256:c91c4afd8abc3908e00a44b2672718905b8611503f7ff87390cc0ac3423fb096"},
+    {file = "numpy-1.24.3-cp311-cp311-win_amd64.whl", hash = "sha256:5342cf6aad47943286afa6f1609cad9b4266a05e7f2ec408e2cf7aea7ff69d80"},
+    {file = "numpy-1.24.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:7776ea65423ca6a15255ba1872d82d207bd1e09f6d0894ee4a64678dd2204078"},
+    {file = "numpy-1.24.3-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:ae8d0be48d1b6ed82588934aaaa179875e7dc4f3d84da18d7eae6eb3f06c242c"},
+    {file = "numpy-1.24.3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ecde0f8adef7dfdec993fd54b0f78183051b6580f606111a6d789cd14c61ea0c"},
+    {file = "numpy-1.24.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4749e053a29364d3452c034827102ee100986903263e89884922ef01a0a6fd2f"},
+    {file = "numpy-1.24.3-cp38-cp38-win32.whl", hash = "sha256:d933fabd8f6a319e8530d0de4fcc2e6a61917e0b0c271fded460032db42a0fe4"},
+    {file = "numpy-1.24.3-cp38-cp38-win_amd64.whl", hash = "sha256:56e48aec79ae238f6e4395886b5eaed058abb7231fb3361ddd7bfdf4eed54289"},
+    {file = "numpy-1.24.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:4719d5aefb5189f50887773699eaf94e7d1e02bf36c1a9d353d9f46703758ca4"},
+    {file = "numpy-1.24.3-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0ec87a7084caa559c36e0a2309e4ecb1baa03b687201d0a847c8b0ed476a7187"},
+    {file = "numpy-1.24.3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ea8282b9bcfe2b5e7d491d0bf7f3e2da29700cec05b49e64d6246923329f2b02"},
+    {file = "numpy-1.24.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:210461d87fb02a84ef243cac5e814aad2b7f4be953b32cb53327bb49fd77fbb4"},
+    {file = "numpy-1.24.3-cp39-cp39-win32.whl", hash = "sha256:784c6da1a07818491b0ffd63c6bbe5a33deaa0e25a20e1b3ea20cf0e43f8046c"},
+    {file = "numpy-1.24.3-cp39-cp39-win_amd64.whl", hash = "sha256:d5036197ecae68d7f491fcdb4df90082b0d4960ca6599ba2659957aafced7c17"},
+    {file = "numpy-1.24.3-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:352ee00c7f8387b44d19f4cada524586f07379c0d49270f87233983bc5087ca0"},
+    {file = "numpy-1.24.3-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a7d6acc2e7524c9955e5c903160aa4ea083736fde7e91276b0e5d98e6332812"},
+    {file = "numpy-1.24.3-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:35400e6a8d102fd07c71ed7dcadd9eb62ee9a6e84ec159bd48c28235bbb0f8e4"},
+    {file = "numpy-1.24.3.tar.gz", hash = "sha256:ab344f1bf21f140adab8e47fdbc7c35a477dc01408791f8ba00d018dd0bc5155"},
 ]
 
 [[package]]
@@ -1447,6 +1575,27 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "tqdm"
+version = "4.65.0"
+description = "Fast, Extensible Progress Meter"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tqdm-4.65.0-py3-none-any.whl", hash = "sha256:c4f53a17fe37e132815abceec022631be8ffe1b9381c2e6e30aa70edc99e9671"},
+    {file = "tqdm-4.65.0.tar.gz", hash = "sha256:1871fb68a86b8fb3b59ca4cdd3dcccbc7e6d613eeed31f4c332531977b89beb5"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["py-make (>=0.1.0)", "twine", "wheel"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
+
+[[package]]
 name = "trio"
 version = "0.22.0"
 description = "A friendly Python library for async concurrency and I/O"
@@ -1782,4 +1931,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.6"
-content-hash = "b7b65ae73ba5cf5409454e3b882526e9fdcc622753b84e4e249d53661633a1fc"
+content-hash = "47f1a8b633a722b31147255b722603156208d081cfa983fce870928159fa5315"
