@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from users.serializers import (
     UserSerializer,
-    UserGetSerializer,
     AchievementSerializer,
     RankingSerializer,
     PasswordResetSerializer,
