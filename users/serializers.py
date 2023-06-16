@@ -106,6 +106,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+<<<<<<< HEAD
 class UserViewSerializer(serializers.ModelSerializer):
     """유저 뷰 시리얼라이저
 
@@ -115,18 +116,32 @@ class UserViewSerializer(serializers.ModelSerializer):
 
     achieve = AchievementSerializer(many=True, required=False)
     followings = UserSerializer(many=True)
+=======
+class UserBattleSerializer(serializers.ModelSerializer):
+    achieve = AchievementSerializer(many=True, required=False)
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
 
     class Meta:
         model = User
         fields = [
             "id",
             "email",
+<<<<<<< HEAD
             "password",
             "username",
             "image",
             "wear_achievement",
             "achieve",
             "followings",
+=======
+            "username",
+            "image",
+            "experiment",
+            "level",
+            "day",
+            "wear_achievement",
+            "achieve",
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
         ]
 
 

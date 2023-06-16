@@ -23,7 +23,15 @@ class BattleConsumer(AsyncWebsocketConsumer):
             self.room_name (str): 프론트엔드에서 전달받은 룸 이름
             self.room_group_name (str): 동일한 메세지를 전달받을 그룹
         """
+<<<<<<< HEAD
         self.user = self.scope["user"].username
+=======
+        # self.user = jwt_decode(
+        #     self.scope["cookies"]["access_token"],
+        #     settings.SECRET_KEY,
+        #     algorithms=["HS256"],
+        # )["username"]
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
         self.access_token_data = jwt_decode(
