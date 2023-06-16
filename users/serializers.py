@@ -40,6 +40,12 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 
 
 class AchievementSerializer(serializers.ModelSerializer):
+    """칭호 시리얼라이저
+
+    칭호 생성 시리얼라이저
+
+    """
+
     class Meta:
         model = Achievement
         fields = ["id", "title", "comment"]
@@ -66,6 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
             "image",
             "wear_achievement",
             "achieve",
+            "followings",
         ]
 
     def create(self, validated_data):
@@ -97,13 +104,15 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserGetSerializer(serializers.ModelSerializer):
-    """유저 조회 시리얼라이저
+class UserViewSerializer(serializers.ModelSerializer):
+    """유저 뷰 시리얼라이저
 
-    회원정보 조회 기능에 사용됩니다.
+    유저 보기전용 시리얼라이저
+
     """
 
     achieve = AchievementSerializer(many=True, required=False)
+    followings = UserSerializer(many=True)
 
     class Meta:
         model = User
@@ -116,7 +125,6 @@ class UserGetSerializer(serializers.ModelSerializer):
             "wear_achievement",
             "achieve",
             "followings",
-            "followers",
         ]
 
 
@@ -130,14 +138,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class RankingSerializer(serializers.ModelSerializer):
+    player = UserSerializer()
+
     class Meta:
-        model = User
-        fields = [
-            "username",
-            "image",
-            "wear_achievement",
-            "achieve",
-        ]
+        model = UserInfo
+        fields = ["player", "level", "experiment"]
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
