@@ -49,6 +49,11 @@ class AchievementSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """유저 시리얼라이저
+
+    회원가입, 회원정보 수정 기능에 사용됩니다.
+    """
+
     achieve = AchievementSerializer(many=True, required=False)
 
     class Meta:
@@ -61,8 +66,6 @@ class UserSerializer(serializers.ModelSerializer):
             "image",
             "wear_achievement",
             "achieve",
-            "followings",
-            "followers",
         ]
 
     def create(self, validated_data):
@@ -92,6 +95,29 @@ class UserSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
+
+
+class UserGetSerializer(serializers.ModelSerializer):
+    """유저 조회 시리얼라이저
+
+    회원정보 조회 기능에 사용됩니다.
+    """
+
+    achieve = AchievementSerializer(many=True, required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "password",
+            "username",
+            "image",
+            "wear_achievement",
+            "achieve",
+            "followings",
+            "followers",
+        ]
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
