@@ -25,7 +25,6 @@ from crawled_data.serializers import NaverQuizSerializer, KrDictQuizSerializer
 
 class PuzzleCreateView(APIView):
     def get(self, request):
-        quiz_generator = QuizGenerator([0, 0, 2, 0])
+        quiz_generator = QuizGenerator([3, 3, 4, 0])
         quiz = quiz_generator.generator()
-        # print(quiz)
         return Response(quiz)

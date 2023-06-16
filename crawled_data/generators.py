@@ -3,12 +3,11 @@ from crawled_data.serializers import (
     NaverQuizSerializer,
     KrDictQuizSerializer,
     FillInTheBlankSerializer,
+    MeaningSerializer,
 )
 import random
 import numpy as np
-import re
 from kiwipiepy import Kiwi
-from tokenize import tokenize, untokenize
 from django.db.models import Count
 
 kiwi = Kiwi(model_type="sbg")
@@ -47,14 +46,6 @@ class QuizGenerator:
         self._counts = sum(puzzle)
         self._puzzles = puzzle
 
-    # def generate(self):
-    #     quiz_objects_ids = self.model.objects.values_list("id", flat=True)
-    #     id_list = list(quiz_objects_ids)
-
-    #     quiz_ids = random.sample(id_list, k=self._count)
-
-    #     return self.model.objects.filter(id__in=quiz_ids)
-
     def generator(self):
         puzzle_list = dict()
 
@@ -78,7 +69,22 @@ class QuizGenerator:
         return serializer.data
 
     def meaning(self, puzzle_count):
-        pass
+        """단어의 의미를 주고 몇 번이 답인지 맞추기
+
+
+        Args:
+            puzzle_count (int): 배정된 퍼즐 수
+        """
+
+        # 전체 설명문 개수 count
+        all_quiz_count = KrDictQuiz.objects.all().count()
+        all_quiz_array = range(0, all_quiz_count + 1)
+        random_num = random.sample(all_quiz_array, k=puzzle_count)
+        right_answer_quiz = KrDictQuiz.objects.filter(id__in=random_num)
+
+        serializer = MeaningSerializer(right_answer_quiz, many=True)
+
+        return serializer.data
 
     def fill_in_the_blank(self, puzzle_count):
         """빈칸에 알맞은 말 맞추기
@@ -163,7 +169,12 @@ class QuizGenerator:
         _array_size = 8  # 행렬 크기
         _voca_number = 5  # 단어 수
 
-        voca_array = np.empty((_array_size, _array_size), dtype=list)
+        cross_word_puzzle = CrossWordPuzzleGenerator(_array_size, _voca_number)
 
-        #
-        # print(voca_array)
+
+class CrossWordPuzzleGenerator:
+    def __init__(self, size: int, num: int):
+        self._array_size = size  # 행렬 크기
+        self._voca_number = num  # 단어 수
+
+        voca_array = np.empty((self._array_size, self._array_size), dtype=list)
