@@ -6,8 +6,7 @@ from channels.consumer import async_to_sync
 from asgiref.sync import sync_to_async
 from urllib.parse import parse_qs
 from jwt import decode as jwt_decode
-from channels.db import database_sync_to_async
-import os
+from django.conf import settings
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -23,29 +22,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
             self.room_name (str): 프론트엔드에서 전달받은 룸 이름
             self.room_group_name (str): 동일한 메세지를 전달받을 그룹
         """
-<<<<<<< HEAD
-<<<<<<< HEAD
         self.user = self.scope["user"].username
-=======
-=======
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
-        # self.user = jwt_decode(
-        #     self.scope["cookies"]["access_token"],
-        #     settings.SECRET_KEY,
-        #     algorithms=["HS256"],
-        # )["username"]
-<<<<<<< HEAD
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
-=======
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
-        self.access_token_data = jwt_decode(
-            self.scope["cookies"]["access_token"],
-            key=os.environ.get("SECRET_KEY"),
-            algorithms="HS256",
-        )
-        print(self.access_token_data)
+
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         # 웹소켓 연결 시점

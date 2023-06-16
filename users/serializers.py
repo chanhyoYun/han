@@ -7,8 +7,6 @@ import random, string
 
 from users.models import User, Achievement, UserInfo
 from users.customtoken import user_email_verify_token
-from users.models import User
-from django.contrib.sessions.models import Session
 
 
 def password_maker():
@@ -106,8 +104,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 class UserViewSerializer(serializers.ModelSerializer):
     """유저 뷰 시리얼라이저
 
@@ -117,42 +113,18 @@ class UserViewSerializer(serializers.ModelSerializer):
 
     achieve = AchievementSerializer(many=True, required=False)
     followings = UserSerializer(many=True)
-=======
-class UserBattleSerializer(serializers.ModelSerializer):
-    achieve = AchievementSerializer(many=True, required=False)
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
-=======
-class UserBattleSerializer(serializers.ModelSerializer):
-    achieve = AchievementSerializer(many=True, required=False)
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
 
     class Meta:
         model = User
         fields = [
             "id",
             "email",
-<<<<<<< HEAD
-<<<<<<< HEAD
             "password",
             "username",
             "image",
             "wear_achievement",
             "achieve",
             "followings",
-=======
-=======
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
-            "username",
-            "image",
-            "experiment",
-            "level",
-            "day",
-            "wear_achievement",
-            "achieve",
-<<<<<<< HEAD
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
-=======
->>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
         ]
 
 
@@ -163,16 +135,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["username"] = user.username
         return token
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-
-        request = self.context["request"]
-        request.session.save()
-
-        data["session_data"] = request.session.session_key
-
-        return data
 
 
 class RankingSerializer(serializers.ModelSerializer):
