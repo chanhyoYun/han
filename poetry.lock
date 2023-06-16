@@ -1932,7 +1932,11 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 lock-version = "2.0"
 python-versions = "^3.8.6"
 <<<<<<< HEAD
+<<<<<<< HEAD
 content-hash = "47f1a8b633a722b31147255b722603156208d081cfa983fce870928159fa5315"
+=======
+content-hash = "b7b65ae73ba5cf5409454e3b882526e9fdcc622753b84e4e249d53661633a1fc"
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
 =======
 content-hash = "b7b65ae73ba5cf5409454e3b882526e9fdcc622753b84e4e249d53661633a1fc"
 >>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65

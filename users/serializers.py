@@ -107,6 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class UserViewSerializer(serializers.ModelSerializer):
     """유저 뷰 시리얼라이저
 
@@ -120,12 +121,17 @@ class UserViewSerializer(serializers.ModelSerializer):
 class UserBattleSerializer(serializers.ModelSerializer):
     achieve = AchievementSerializer(many=True, required=False)
 >>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
+=======
+class UserBattleSerializer(serializers.ModelSerializer):
+    achieve = AchievementSerializer(many=True, required=False)
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
 
     class Meta:
         model = User
         fields = [
             "id",
             "email",
+<<<<<<< HEAD
 <<<<<<< HEAD
             "password",
             "username",
@@ -134,6 +140,8 @@ class UserBattleSerializer(serializers.ModelSerializer):
             "achieve",
             "followings",
 =======
+=======
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
             "username",
             "image",
             "experiment",
@@ -141,6 +149,9 @@ class UserBattleSerializer(serializers.ModelSerializer):
             "day",
             "wear_achievement",
             "achieve",
+<<<<<<< HEAD
+>>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
+=======
 >>>>>>> 5d76fefffcdb0242af12adc71d1576c901393e65
         ]
 
