@@ -7,6 +7,7 @@ from users.serializers import (
     PasswordResetSerializer,
     UserInfoSerializer,
     CustomTokenObtainPairSerializer,
+    UserViewSerializer,
 )
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -31,7 +32,8 @@ class UserView(APIView):
     def post(self, request):
         """회원가입
 
-        post요청과 email, password를 입력 받음
+        Args:
+            request : email, password, username 입력 받음
 
         Returns:
             status 201 : "가입완료" 메세지 반환, 회원 가입
@@ -129,7 +131,7 @@ class UserDetailView(APIView):
             status 404 : 회원정보 없음
         """
         user = get_object_or_404(User, id=user_id)
-        serializer = UserGetSerializer(user)
+        serializer = UserViewSerializer(user)
         user_info = get_object_or_404(UserInfo, player_id=user_id)
         serializer_info = UserInfoSerializer(user_info)
         if serializer.data["wear_achievement"] != -1:
@@ -155,7 +157,7 @@ class UserDetailView(APIView):
         """회원정보 수정
 
         Args:
-            request : 로그인 회원정보, 수정 데이터
+            request : username, wear_achievement, image 수정 데이터 입력 받음
             user_id : 회원 고유 pk
 
         Returns:
@@ -208,6 +210,11 @@ class AchievementView(APIView):
     """
 
     def get(self, request, achieve_id):
+        """모든 칭호 보기
+
+        Returns:
+            status 200 : 모든 achieve 데이터
+        """
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -236,12 +243,12 @@ class FollowView(APIView):
         if me != you:
             if me in you.followers.all():
                 you.followers.remove(me)
-                return Response("팔로우 취소", status=status.HTTP_204_NO_CONTENT)
+                return Response("팔로우 취소", status=status.HTTP_200_OK)
             else:
                 you.followers.add(me)
                 return Response("팔로우 완료", status=status.HTTP_200_OK)
         else:
-            return Response("자기 자신은 팔로우 불가합니다.", status=status.HTTP_205_RESET_CONTENT)
+            return Response("자기 자신은 팔로우 불가합니다.", status=status.HTTP_200_OK)
 
 
 class RankingView(ListAPIView):
@@ -251,7 +258,7 @@ class RankingView(ListAPIView):
     """
 
     serializer_class = RankingSerializer
-    # queryset = User.objects.all().order_by("-experiment")
+    queryset = UserInfo.objects.all().order_by("-level", "-experiment")
 
     def get_queryset(self):
         """랭킹 조회

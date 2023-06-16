@@ -33,6 +33,18 @@ class MyUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    """유저 모델
+
+    Attributes:
+        email : 로그인 이메일
+        username : 닉네임
+        is_active : 활성화 여부
+        is_admin : 관리자 계정 여부
+        image : 프로필사진 필드
+        achieve : 보유 칭호 필드
+        wear_achievement : 착용중인 칭호 정보
+    """
+
     email = models.EmailField(
         verbose_name="email address",
         max_length=255,
@@ -71,12 +83,26 @@ class User(AbstractBaseUser):
 
 
 class UserInfo(models.Model):
+    """유저 정보 모델
+
+    Attributes:
+        player : 연결되어 있는 유저
+        level : 유저 레벨
+        experiment : 유저 경험치
+        max_experiment : 레벨에 비례한 경험치통
+        total_study_day : 총 학습일수
+        day : 연속 출석일수
+        attend : 마지막 학습 날짜
+        quizzes_count : 푼 문제 갯수
+    """
+
     player = models.ForeignKey(User, related_name="player", on_delete=models.CASCADE)
     level = models.PositiveIntegerField(default=1)
     experiment = models.PositiveIntegerField(default=0)
     max_experiment = models.IntegerField(default=100)
+    total_study_day = models.PositiveIntegerField(default=0)
     day = models.PositiveIntegerField(default=0)
     attend = models.DateTimeField(
-        auto_now=False, auto_now_add=False, blank=True, null=True
+        auto_now=False, auto_now_add=True, blank=True, null=True
     )
     quizzes_count = models.PositiveIntegerField(default=0)

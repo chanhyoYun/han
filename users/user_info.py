@@ -1,41 +1,56 @@
 from rest_framework.generics import get_object_or_404
 from users.models import User, UserInfo
 from users.serializers import UserSerializer
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def check_user_info(serializer, user_id):
+    """변경되는 유저정보 확인 함수
+
+    유저레벨, 경험치, 학습일수, 연속학습일 수 반영
+
+    """
     user = get_object_or_404(User, pk=user_id)
     user_info = get_object_or_404(UserInfo, player_id=user_id)
 
+    # 유저 경험치 반영
     solved_quizzes = [x for x in serializer if x["solved"]]
     earn_exp = 10 * len(solved_quizzes)
     user_info.experiment += earn_exp
-
-    user_info.quizzes_count += len(solved_quizzes)
 
     if user_info.experiment >= user_info.max_experiment:
         user_info.level += 1
         user_info.experiment -= user_info.max_experiment
         user_info.max_experiment += (user_info.level - 1) * 10
 
-    user_attend = str(user_info.attend).split(" ")[0]
-    user_last_login = str(user.last_login).split(" ")[0]
-    today = datetime.now()
+    # 유저 푼 문제 갯수 카운터
+    user_info.quizzes_count += len(solved_quizzes)
 
-    if int(user_last_login.split("-")[2]) - int(user_attend.split("-")[2]) == 1:
+    # 유저 학습일수, 연속 학습일수 반영
+    today = datetime.now()
+    user_attend = user.last_login - user_info.attend
+
+    if user_attend.days == 1:
         user_info.day += 1
-    elif int(user_last_login.split("-")[2]) - int(user_attend.split("-")[2]) != 0:
+    else:
         user_info.day = 1
 
-    if user_attend != user_last_login:
+    if str(user_info.attend).split(" ")[0] != str(user.last_login).split(" ")[0]:
+        user_info.total_study_day += 1
         user_info.attend = today
 
     user_info.save()
+
+    # 저장된 유저정보에 따른 칭호 지급 확인
     check_achieve(user_id)
 
 
 def check_achieve(user_id):
+    """칭호 지급 함수
+
+    각 칭호 지급 조건에 따른 칭호 지급
+
+    """
     user = get_object_or_404(User, pk=user_id)
     serializer = UserSerializer(user)
     user_info = get_object_or_404(UserInfo, player_id=user_id)
