@@ -17,27 +17,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from users.customtoken import user_email_verify_token
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer_context = {"request": request}
-
-        serializer = self.get_serializer(data=request.data, context=serializer_context)
-
-        try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            raise InvalidToken(e.args[0])
-
-        user = User.objects.get(email=request.data["email"])
-        request.session["id"] = user.id
-        print(request.data)
-
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserView(APIView):
