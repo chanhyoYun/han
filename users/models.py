@@ -76,4 +76,7 @@ class UserInfo(models.Model):
     experiment = models.PositiveIntegerField(default=0)
     max_experiment = models.IntegerField(default=100)
     day = models.PositiveIntegerField(default=0)
+    attend = models.DateTimeField(
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
     quizzes_count = models.PositiveIntegerField(default=0)

@@ -72,6 +72,7 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
         ("Permissions", {"fields": ["is_admin", "is_active"]}),
+        ("Important dates", {"fields": ["last_login"]}),
     ]
 
     add_fieldsets = [
@@ -93,8 +94,12 @@ admin.site.unregister(Group)
 
 
 class AchievementAdmin(admin.ModelAdmin):
-    list_display = ["title"]
+    list_display = ["id", "title", "comment"]
+
+
+class UserInfoAdmin(admin.ModelAdmin):
+    list_display = ["player"]
 
 
 admin.site.register(Achievement, AchievementAdmin)
-admin.site.register(UserInfo)
+admin.site.register(UserInfo, UserInfoAdmin)
