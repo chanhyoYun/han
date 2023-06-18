@@ -100,6 +100,9 @@ class UserSerializer(serializers.ModelSerializer):
         instance.wear_achievement = validated_data.get(
             "wear_achievement", instance.wear_achievement
         )
+        password = validated_data.get("password")
+        if password:
+            instance.set_password(password)
         instance.save()
         return instance
 
