@@ -19,7 +19,7 @@ from users.models import UserInfo
 
 state = os.environ.get("STATE")
 BASE_URL = "http://127.0.0.1:5500/"
-CALLBACK_URI = BASE_URL + "html/index.html"
+CALLBACK_URI = BASE_URL + "html/home.html"
 
 
 # 구글 로그인
