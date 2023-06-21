@@ -235,19 +235,20 @@ class FollowView(APIView):
         Returns:
             status 200 : 내 팔로잉 목록에 해당 유저 추가
             status 204 : 내 팔로잉 목록에서 해당 유저 제거
-            status 205 : 자기 자신은 팔로우 할 수 없음
+            status 400 : 자기 자신은 팔로우 할 수 없음
+            stauts 404 : 유저를 찾을 수 없음
         """
         you = get_object_or_404(User, id=user_id)
         me = request.user
         if me != you:
             if me in you.followers.all():
                 you.followers.remove(me)
-                return Response("팔로우 취소", status=status.HTTP_200_OK)
+                return Response("팔로우 취소", status=status.HTTP_204_NO_CONTENT)
             else:
                 you.followers.add(me)
                 return Response("팔로우 완료", status=status.HTTP_200_OK)
         else:
-            return Response("자기 자신은 팔로우 불가합니다.", status=status.HTTP_200_OK)
+            return Response("자기 자신은 팔로우 불가합니다.", status=status.HTTP_400_BAD_REQUEST)
 
 
 class RankingView(ListAPIView):

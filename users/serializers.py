@@ -4,6 +4,7 @@ from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 import random, string
+import os
 
 from users.models import User, Achievement, UserInfo
 from users.customtoken import user_email_verify_token
@@ -85,10 +86,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         uidb64 = urlsafe_base64_encode(force_bytes(user.id))
         token = user_email_verify_token.make_token(user)
+        url = os.environ.get("FRONTEND_BASE_URL")
         to_email = user.email
         email = EmailMessage(
             f"<한> {user.username}님의 계정 인증",
-            f"아래의 링크를 누르면 이메일 인증이 완료됩니다. \n\nhttp://127.0.0.1:8000/users/verify/{uidb64}/{token}",
+            f"아래의 링크를 누르면 이메일 인증이 완료됩니다. \n\n{url}/html/activate.html?verify={uidb64}&token={token}",
             to=[to_email],
         )
         email.send()
