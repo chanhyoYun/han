@@ -60,4 +60,4 @@ class QuizReportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuizReport
-        fields = ("content",)
+        fields = ("user", "content", "quiz_type", "quiz_content",)

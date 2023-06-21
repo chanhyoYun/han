@@ -46,13 +46,15 @@ class QuizReport(models.Model):
     퀴즈 신고내용을 저장하는 모델입니다.
 
     Attributes:
-        quiz_id (ForeignKey): 신고대상 퀴즈의 ID.
         user (ForeignKey): 신고한 user의 ID.
-        content (BooleanField): 신고 내용.
+        content (TextField): 신고 내용.
+        quiz_type (CharField): 신고대상 퀴즈의 유형
+        quiz_content (JSONField): 신고대상 퀴즈의 문제 내용. json 형식으로 저장되며 제목이 필수로, 추가적으로 내용/보기가 담김
         created_at (DateTimeField): 신고 날짜.
     """
 
-    quiz = models.ForeignKey(UserQuiz, on_delete=models.CASCADE, related_name="reports")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+    quiz_type = models.CharField(max_length=16)
+    quiz_content = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)

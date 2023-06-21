@@ -92,7 +92,7 @@ class QuizReportView(APIView):
     post요청시 퀴즈 신고를 받습니다.
     """
 
-    def post(self, request, quiz_id):
+    def post(self, request):
         """퀴즈 신고 뷰 post
 
         퀴즈 신고를 받습니다.
@@ -102,10 +102,12 @@ class QuizReportView(APIView):
             오류 400: 올바르지 않은 입력
             오류 404: 퀴즈 찾을수 없음
         """
-        quiz = get_object_or_404(UserQuiz, id=quiz_id)
-        serializer = QuizReportSerializer(data=request.data)
+        user = request.user
+        report_data = request.data
+        report_data["user"] = user.id
+        serializer = QuizReportSerializer(data=report_data)
         if serializer.is_valid():
-            serializer.save(quiz=quiz, user=request.user)
-            return Response({"message": "신고완료"}, status=status.HTTP_200_OK)
+            serializer.save()
+            return Response({"message": "신고가 완료되었습니다."}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
