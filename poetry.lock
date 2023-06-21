@@ -825,6 +825,18 @@ mypy = ["click (>=6.0)", "mypy (==0.812)", "twisted (>=16.4.0)"]
 scripts = ["click (>=6.0)", "twisted (>=16.4.0)"]
 
 [[package]]
+name = "jamo"
+version = "0.4.1"
+description = "A Hangul syllable and jamo analyzer."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "jamo-0.4.1-py3-none-any.whl", hash = "sha256:d4b94fd23324c606ed2fbc4037c603e2c3a7ae9390c05d3473aea1ccb6b1c3fb"},
+    {file = "jamo-0.4.1.tar.gz", hash = "sha256:ea65cf9d35338d0e0af48d75ff426d8a369b0ebde6f07051c3ac37256f56d025"},
+]
+
+[[package]]
 name = "jwcrypto"
 version = "1.5.0"
 description = "Implementation of JOSE Web standards"
@@ -1931,4 +1943,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.6"
-content-hash = "47f1a8b633a722b31147255b722603156208d081cfa983fce870928159fa5315"
+content-hash = "b9d4f9a98a05274deffa396e4cc967d1531b88085887ac905c8504362e534ead"

@@ -9,6 +9,9 @@ import random
 import numpy as np
 from kiwipiepy import Kiwi
 from django.db.models import Count
+from django.db.models import Prefetch
+from django.contrib.postgres.aggregates import ArrayAgg
+from jamo import h2j, j2hcj
 
 kiwi = Kiwi(model_type="sbg")
 import json
@@ -170,8 +173,8 @@ class QuizGenerator:
         if puzzle_count > 1:
             raise ValueError("십자말퍼즐은 0 혹은 1개만 가능합니다.")
 
-        _array_size = 8  # 행렬 크기
-        _voca_number = 5  # 단어 수
+        _array_size = 6  # 행렬 크기
+        _voca_number = 8  # 단어 수
 
         cross_word_puzzle = CrossWordPuzzleGenerator(_array_size, _voca_number)
         voca_array, voca_list = cross_word_puzzle.generate()
@@ -188,9 +191,22 @@ class CrossWordPuzzleGenerator:
         self._all_quiz_count = KrDictQuiz.objects.all().count()  # 모든 단어 수 카운트
         self._array_size = size  # 행렬 크기
         self._voca_number = num  # 단어 수
-        self._word_list = list(
-            KrDictQuiz.objects.values_list("id", "word", "explains__content")
+
+        explains_prefetch = Prefetch(
+            "explains",
+            queryset=KrDictQuizExplain.objects.only("content").exclude(
+                content__contains="1"
+            )[:2],
         )
+
+        self._word_list = (
+            KrDictQuiz.objects.prefetch_related(explains_prefetch)
+            .annotate(explains_content=ArrayAgg("explains__content"))
+            .values_list("id", "word", "explains_content")
+        )
+        # self._word_list = list(
+        #     KrDictQuiz.objects.values_list("id", "word", "explains__content")
+        # )
         self.used_word_index = []
         self._orientation = ["right", "bottom"]
         # 단어 집어넣는 거 실패 여부 체크하는 변수
@@ -316,21 +332,45 @@ class CrossWordPuzzleGenerator:
 
     def find_words_starting_with(self, letter):
         # KrDictQuiz에서 letter로 시작하는 단어들을 모두 찾아서 반환
-        matched_words = KrDictQuiz.objects.filter(word__startswith=letter).values_list(
-            "id", "word", "explains__content"
+        explains_prefetch = Prefetch(
+            "explains",
+            queryset=KrDictQuizExplain.objects.only("content").exclude(
+                content__contains="1"
+            )[:2],
         )
+
+        matched_words = (
+            KrDictQuiz.objects.filter(word__startswith=letter)
+            .prefetch_related(explains_prefetch)
+            .annotate(explains_content=ArrayAgg("explains__content"))
+            .values_list("id", "word", "explains_content")
+        )
+
         if len(matched_words) == 0:
             return False
         return matched_words
 
     def try_place_word(self, puzzle, voca_list, word_info, orientation, row, col):
         """삽입 가능한지 확인하고 넣는 함수"""
+        for info in voca_list:
+            if word_info[1] in info["word"] or info["word"] in word_info[1]:
+                return False
+
         if self.can_place_word(puzzle, word_info[1], row, col, orientation):
             self.place_word(puzzle, word_info[1], row, col, orientation)
+
+            allInit = []
+            for x in word_info[1]:
+                temp = h2j(x)
+                imf = j2hcj(temp)  # init,middle,final
+                allInit.append(imf[0])
+
+            voca_hint = "".join(allInit)
             voca_info = {
                 "word_num": word_info[0],
                 "word": word_info[1],
                 "explain": word_info[2],
+                "hint": voca_hint,
                 "position": (row, col),
                 "orientation": orientation,
             }
