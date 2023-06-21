@@ -29,6 +29,7 @@ drf-social-oauth2 = "^2.1.3"
 django-redis-sessions = "^0.6.2"
 numpy = "^1.24.3"
 kiwipiepy = "^0.15.2"
+jamo = "^0.4.1"
 
 
 [build-system]
