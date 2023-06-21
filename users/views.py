@@ -258,7 +258,7 @@ class RankingView(ListAPIView):
     """
 
     serializer_class = RankingSerializer
-    queryset = UserInfo.objects.all().order_by("-level", "-experiment")
+    queryset = UserInfo.objects.filter(player__is_active=True).order_by("-level", "-experiment")
 
     def get_queryset(self):
         """랭킹 조회
