@@ -14,7 +14,7 @@ from quizzes.generators import QuizGenerator
 from users.user_info import check_user_info
 
 
-class QuizView(APIView):
+class QuizResultView(APIView):
     """퀴즈 뷰
 
     get요청시 퀴즈를 제공합니다.
