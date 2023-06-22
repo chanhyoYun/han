@@ -18,8 +18,9 @@ from users.customtoken import CustomAccessToken, CustomRefreshToken
 from users.models import UserInfo
 
 state = os.environ.get("STATE")
-BASE_URL = "http://127.0.0.1:5500/"
-CALLBACK_URI = BASE_URL + "html/home.html"
+CALLBACK_URI = os.environ.get("FRONTEND_BASE_URL") + os.environ.get(
+    "SOCIAL_CALLBACK_URI"
+)
 
 
 # 구글 로그인
@@ -112,13 +113,18 @@ class GoogleLogin(SocialLoginView):
         if request.data["log"]:
             UserInfo.objects.create(player=user)
 
-        access_token = CustomAccessToken.for_user(user)
-        refresh_token = CustomRefreshToken.for_user(user)
+        if user.is_active:
+            access_token = CustomAccessToken.for_user(user)
+            refresh_token = CustomRefreshToken.for_user(user)
 
-        return Response(
-            {"refresh": str(refresh_token), "access": str(access_token)},
-            status=status.HTTP_200_OK,
-        )
+            return Response(
+                {"refresh": str(refresh_token), "access": str(access_token)},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "탈퇴한 회원입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 def kakao_login(request):
@@ -214,13 +220,18 @@ class KakaoLogin(SocialLoginView):
         if request.data["log"]:
             UserInfo.objects.create(player=user)
 
-        access_token = CustomAccessToken.for_user(user)
-        refresh_token = CustomRefreshToken.for_user(user)
+        if user.is_active:
+            access_token = CustomAccessToken.for_user(user)
+            refresh_token = CustomRefreshToken.for_user(user)
 
-        return Response(
-            {"refresh": str(refresh_token), "access": str(access_token)},
-            status=status.HTTP_200_OK,
-        )
+            return Response(
+                {"refresh": str(refresh_token), "access": str(access_token)},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "탈퇴한 회원입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 def naver_login(request):
@@ -309,10 +320,15 @@ class NaverLogin(SocialLoginView):
         if request.data["log"]:
             UserInfo.objects.create(player=user)
 
-        access_token = CustomAccessToken.for_user(user)
-        refresh_token = CustomRefreshToken.for_user(user)
+        if user.is_active:
+            access_token = CustomAccessToken.for_user(user)
+            refresh_token = CustomRefreshToken.for_user(user)
 
-        return Response(
-            {"refresh": str(refresh_token), "access": str(access_token)},
-            status=status.HTTP_200_OK,
-        )
+            return Response(
+                {"refresh": str(refresh_token), "access": str(access_token)},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "탈퇴한 회원입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
