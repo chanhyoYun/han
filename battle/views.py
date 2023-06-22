@@ -49,11 +49,12 @@ class GameView(APIView):
         serializer = BattleCreateSerializer(data=request.data)
         if serializer.is_valid():
             room_id_check = serializer.save(host_user=request.user)
+            print(room_id_check.id)
             new_room = CurrentBattleList.objects.get(id=room_id_check.id)
             BattleUser.objects.create(
                 btl=new_room, participant=request.user, is_host=True
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(room_id_check.id, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

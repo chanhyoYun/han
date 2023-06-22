@@ -1,12 +1,10 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from battle.models import CurrentBattleList
-from channels.consumer import async_to_sync
-from asgiref.sync import sync_to_async
-from urllib.parse import parse_qs
-from jwt import decode as jwt_decode
-from django.conf import settings
+from battle.models import CurrentBattleList, BattleUser
+from users.models import User
+from channels.db import database_sync_to_async
+from django.shortcuts import get_object_or_404
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -30,6 +28,9 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         # 웹소켓 연결 시점
         await self.accept()
+
+        # accept되는 시점에 방에 배틀 인원에 추가
+        await self.join_game()
 
     async def disconnect(self, close_code):
         """웹소켓 연결 해제"""
@@ -63,5 +64,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
         # 웹소켓에 메세지 전달
         await self.send(text_data=json.dumps({"message": message}))
 
+    @database_sync_to_async
     def join_game(self):
-        pass
+        user = get_object_or_404(User, username=self.user)
+        battle_room = CurrentBattleList.objects.get(id=self.room_name)
+
+        check_already_in = BattleUser.objects.filter(
+            btl=battle_room, participant=user
+        ).exists()
+
+        if not check_already_in:
+            BattleUser.objects.create(btl=battle_room, participant=user)
