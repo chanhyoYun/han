@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from quizzes.serializers import (
@@ -42,6 +42,8 @@ class QuizSuggestView(APIView):
     post요청시 퀴즈 제안을 받아 저장합니다.
     """
 
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
         """유저 퀴즈 뷰 post
 
@@ -74,6 +76,8 @@ class QuizReportView(APIView):
 
     post요청시 퀴즈 신고를 받습니다.
     """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """퀴즈 신고 뷰 post

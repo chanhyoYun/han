@@ -119,6 +119,8 @@ class UserDetailView(APIView):
     회원 정보 보기, 수정, 삭제를 처리하는 뷰
     """
 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request, user_id):
         """회원정보 조회
 
@@ -225,6 +227,8 @@ class FollowView(APIView):
     유저끼리의 팔로우
     """
 
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, user_id):
         """팔로우 완료, 취소
 
@@ -258,7 +262,9 @@ class RankingView(ListAPIView):
     """
 
     serializer_class = RankingSerializer
-    queryset = UserInfo.objects.filter(player__is_active=True).order_by("-level", "-experiment")
+    queryset = UserInfo.objects.filter(player__is_active=True).order_by(
+        "-level", "-experiment"
+    )
 
     def get_queryset(self):
         """랭킹 조회
