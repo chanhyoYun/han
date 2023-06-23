@@ -119,7 +119,7 @@ class UserDetailView(APIView):
     회원 정보 보기, 수정, 삭제를 처리하는 뷰
     """
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, user_id):
         """회원정보 조회
