@@ -35,8 +35,8 @@ class UserView(APIView):
             request : email, password, username 입력 받음
 
         Returns:
-            status 201 : "가입완료" 메세지 반환, 회원 가입
-            status 400 : 입력값 에러, (serializer.errors)메세지 반환
+            정상 201 : "가입완료" 메세지 반환, 회원 가입
+            오류 400 : 입력값 에러, (serializer.errors)메세지 반환
         """
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -65,9 +65,9 @@ class EmailVerifyView(APIView):
             token : 해당 유저의 토큰
 
         Returns:
-            status 200 : 인증 완료 메세지 반환. 유저의 is_active가 True로 변환
-            status 400 : keyError 발생 메세지 반환.
-            status 401 : 인증 실패 메세지 반환. check_token 메소드를 통과하지 못함
+            정상 200 : 인증 완료 메세지 반환. 유저의 is_active가 True로 변환
+            오류 400 : keyError 발생 메세지 반환.
+            오류 401 : 인증 실패 메세지 반환. check_token 메소드를 통과하지 못함
         """
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
@@ -99,8 +99,8 @@ class PasswordResetView(APIView):
             request : 비밀번호를 초기화 할 계정의 이메일
 
         Returns:
-            status 200 : 임시 비밀번호로 초기화 완료
-            status 400 : 비밀번호 초기화에 실패
+            정상 200 : 임시 비밀번호로 초기화 완료
+            오류 400 : 비밀번호 초기화에 실패
         """
         user = get_object_or_404(User, email=request.data.get("email"))
         serializer = PasswordResetSerializer(user, data=request.data)
@@ -128,8 +128,8 @@ class UserDetailView(APIView):
             user_id : 회원 고유 아이디
 
         Returns:
-            status 200 : 회원정보 반환
-            status 404 : 회원정보 없음
+            정상 200 : 회원정보 반환
+            오류 404 : 회원정보 없음
         """
         user = get_object_or_404(User, id=user_id)
         serializer = UserViewSerializer(user)
@@ -162,9 +162,9 @@ class UserDetailView(APIView):
             user_id : 회원 고유 pk
 
         Returns:
-            status 200 : "수정완료" 메세지 반환, 회원정보 수정
-            status 400 : (serializer.errors)메세지 반환, 입력값 오류
-            status 401 : "유저가 다릅니다." 메세지 반환, 승인되지 않음
+            정상 200 : "수정완료" 메세지 반환, 회원정보 수정
+            오류 400 : (serializer.errors)메세지 반환, 입력값 오류
+            오류 401 : "유저가 다릅니다." 메세지 반환, 승인되지 않음
         """
         user = get_object_or_404(User, pk=user_id)
         if user == request.user:
@@ -190,8 +190,8 @@ class UserDetailView(APIView):
             user_id : 회원 고유 pk
 
         Returns:
-            status 200 : "탈퇴완료" 메세지 반환, 회원정보 수정
-            status 401 : "유저가 다릅니다." 메세지 반환, 승인되지 않음
+            정상 200 : "탈퇴완료" 메세지 반환, 회원정보 수정
+            오류 401 : "유저가 다릅니다." 메세지 반환, 승인되지 않음
         """
         user = get_object_or_404(User, pk=user_id)
         if user == request.user:
@@ -210,11 +210,11 @@ class AchievementView(APIView):
     전체 칭호를 보고 보유하고 있는 칭호 확인
     """
 
-    def get(self, request, achieve_id):
+    def get(self, request):
         """모든 칭호 보기
 
         Returns:
-            status 200 : 모든 achieve 데이터
+            정상 200 : 모든 achieve 데이터
         """
         achievement = Achievement.objects.all()
         serializer = AchievementSerializer(achievement, many=True)
@@ -237,10 +237,10 @@ class FollowView(APIView):
             user_id : 유저 고유 id값
 
         Returns:
-            status 200 : 내 팔로잉 목록에 해당 유저 추가
-            status 204 : 내 팔로잉 목록에서 해당 유저 제거
-            status 400 : 자기 자신은 팔로우 할 수 없음
-            stauts 404 : 유저를 찾을 수 없음
+            정상 200 : 내 팔로잉 목록에 해당 유저 추가
+            정상 200 : 내 팔로잉 목록에서 해당 유저 제거
+            오류 400 : 자기 자신은 팔로우 할 수 없음
+            오류 404 : 유저를 찾을 수 없음
         """
         you = get_object_or_404(User, id=user_id)
         me = request.user
@@ -277,7 +277,7 @@ class RankingView(ListAPIView):
             type(query_param) : 쿼리 파라미터 type 유무 확인
 
         Returns:
-            status 200 : 전체 유저 랭킹순
+            정상 200 : 전체 유저 랭킹순
         """
         queryset_select = {"battle": self.queryset_battle}
         query_param_check = self.request.GET.get("type", None)

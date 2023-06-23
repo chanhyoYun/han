@@ -2,6 +2,7 @@
 **/migrations/*
 !**/migrations/__init__.py
 media
+static
 .vscode
 data_krdict.json
 data_naverquiz.json
@@ -19,6 +20,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+static
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.

@@ -30,6 +30,7 @@ django-redis-sessions = "^0.6.2"
 numpy = "^1.24.3"
 kiwipiepy = "^0.15.2"
 jamo = "^0.4.1"
+drf-extra-fields = "^3.5.0"
 
 
 [build-system]

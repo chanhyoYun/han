@@ -11,9 +11,7 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("", views.UserView.as_view(), name="signup"),
     path("<int:user_id>/", views.UserDetailView.as_view(), name="users_id"),
-    path(
-        "achieve/<int:achieve_id>/", views.AchievementView.as_view(), name="achievement"
-    ),
+    path("achieve/", views.AchievementView.as_view(), name="achievement"),
     path(
         "verify/<str:uidb64>/<str:token>/",
         views.EmailVerifyView.as_view(),
