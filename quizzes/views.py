@@ -7,7 +7,9 @@ from quizzes.serializers import (
     QuizResultSerializer,
     QuizReportSerializer,
 )
-from users.user_info import check_user_info
+from rest_framework.generics import get_object_or_404
+from quizzes.models import UserQuiz
+from users.user_info import check_user_info, user_quiz_pass_update
 
 
 class QuizResultView(APIView):
@@ -15,6 +17,8 @@ class QuizResultView(APIView):
 
     post요청시 퀴즈결과를 받아 처리합니다.
     """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """퀴즈 뷰 post
@@ -69,6 +73,21 @@ class QuizSuggestView(APIView):
             return Response(opt_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "제출완료"}, status=status.HTTP_201_CREATED)
+
+
+class QuizAcceptView(APIView):
+    """유저 퀴즈를 pass 시켜주는 view"""
+
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, quiz_id):
+        quiz = get_object_or_404(UserQuiz, id=quiz_id)
+        quiz.is_pass = True
+        user_quiz_pass_update(quiz.user_id)
+        quiz.save()
+        return Response(
+            {"message": "퀴즈 통과 및 유저 경험치 업데이트 완료"}, status=status.HTTP_200_OK
+        )
 
 
 class QuizReportView(APIView):
