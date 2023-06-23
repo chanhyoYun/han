@@ -6,19 +6,17 @@ class UserQuiz(models.Model):
     """유저 제안 퀴즈 모델
 
     유저가 제안한 퀴즈를 담는 모델입니다.
-    유저 id, 제목, 문항, 해설, 난이도, 통과 여부 필드가 있습니다.
+    유저 id, 문제, 해설, 난이도, 통과 여부 필드가 있습니다.
 
     Attributes:
         user (ForeignKey): 문제를 제안한 user의 ID.
-        title (CharField): 제목.
-        content (CharField): 문항.
+        title (CharField): 문제.
         explain (TextField): 해설.
         is_pass (BooleanField) : 통과 여부. True(관리자가 통과시킨 문제), False(통과되지 않은 문제)
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=30)
-    content = models.CharField(max_length=256)
     explain = models.TextField()
     is_pass = models.BooleanField(default=False)
 
