@@ -11,6 +11,7 @@ class CustomToken(Token):
     이메일과 유저네임을 포함하여 토큰을 제공합니다.
     소셜 로그인 완료처리에서 사용됩니다.
     """
+
     @classmethod
     def for_user(cls, user):
         token = super().for_user(user)
@@ -30,13 +31,13 @@ class CustomRefreshToken(CustomToken, RefreshToken):
 class UserEmailVerifyToken(PasswordResetTokenGenerator):
     """일반 유저 이메일 인증 토큰
 
-    일반 유저 이메일 인증 시 해당 토큰의 정보로 판별하게 한다.
+    일반 유저 이메일 인증 시 판별에 사용하는 토큰
     """
 
     def _make_hash_value(self, user, timestamp):
         """일반 유저 정보 해싱
 
-        PasswordResetTokenGenerator의 _make_hash_value method를 오버라이딩.
+        PasswordResetTokenGenerator의 _make_hash_value method를 오버라이딩
 
         Args:
             user : 유저 모델의 인스턴스 객체
