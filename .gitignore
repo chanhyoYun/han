@@ -5,6 +5,7 @@ media
 .vscode
 data_krdict.json
 data_naverquiz.json
+redis/
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,django,python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,django,python,visualstudiocode

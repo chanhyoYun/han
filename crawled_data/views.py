@@ -4,9 +4,16 @@ from crawled_data.generators import QuizGenerator
 
 
 class PuzzleCreateView(APIView):
+    """퍼즐 생성 View"""
+
     def get(self, request):
         param = request.GET.get("type")
-        param_dict = {"1": [10, 0, 0, 0], "2": [0, 10, 0, 0], "3": [0, 0, 10, 0], "4": [0, 0, 0, 1]}
+        param_dict = {
+            "1": [10, 0, 0, 0],
+            "2": [0, 10, 0, 0],
+            "3": [0, 0, 10, 0],
+            "4": [0, 0, 0, 1],
+        }
         if param:
             quiz_generator = QuizGenerator(param_dict[param])
         else:

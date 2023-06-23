@@ -1,5 +1,4 @@
 # chat/views.py
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -10,14 +9,6 @@ from battle.serializers import (
     BattleListSerializer,
 )
 from rest_framework import status, permissions
-
-
-# def index(request):
-#     return render(request, "chat/index.html")
-
-
-# def room(request, room_name):
-#     return render(request, "chat/room.html", {"room_name": room_name})
 
 
 class GameView(APIView):
@@ -49,7 +40,6 @@ class GameView(APIView):
         serializer = BattleCreateSerializer(data=request.data)
         if serializer.is_valid():
             room_id_check = serializer.save(host_user=request.user)
-            print(room_id_check.id)
             new_room = CurrentBattleList.objects.get(id=room_id_check.id)
             BattleUser.objects.create(
                 btl=new_room, participant=request.user, is_host=True
