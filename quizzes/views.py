@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from quizzes.serializers import (
@@ -7,7 +7,9 @@ from quizzes.serializers import (
     QuizResultSerializer,
     QuizReportSerializer,
 )
-from users.user_info import check_user_info
+from rest_framework.generics import get_object_or_404
+from quizzes.models import UserQuiz
+from users.user_info import check_user_info, user_quiz_pass_update
 
 
 class QuizResultView(APIView):
@@ -15,6 +17,8 @@ class QuizResultView(APIView):
 
     post요청시 퀴즈결과를 받아 처리합니다.
     """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """퀴즈 뷰 post
@@ -41,6 +45,8 @@ class QuizSuggestView(APIView):
 
     post요청시 퀴즈 제안을 받아 저장합니다.
     """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """유저 퀴즈 뷰 post
@@ -69,11 +75,38 @@ class QuizSuggestView(APIView):
         return Response({"message": "제출완료"}, status=status.HTTP_201_CREATED)
 
 
+class QuizAcceptView(APIView):
+    """유저 퀴즈를 통과 시켜주는 뷰"""
+
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, quiz_id):
+        """유저 퀴즈 통과
+
+        Args:
+            request: 요청한 사용자 정보
+            quiz_id: 변경할 퀴즈 pk값
+
+        Returns:
+            정상 200: 유저 퀴즈 및 유저 정보 업데이트 완료
+            오류 404: 요청한 퀴즈를 찾을 수 없음
+        """
+        quiz = get_object_or_404(UserQuiz, id=quiz_id)
+        quiz.is_pass = True
+        user_quiz_pass_update(quiz.user_id)
+        quiz.save()
+        return Response(
+            {"message": "퀴즈 통과 및 유저 경험치 업데이트 완료"}, status=status.HTTP_200_OK
+        )
+
+
 class QuizReportView(APIView):
     """퀴즈 신고 뷰
 
     post요청시 퀴즈 신고를 받습니다.
     """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """퀴즈 신고 뷰 post

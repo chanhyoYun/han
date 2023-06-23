@@ -30,7 +30,7 @@ def check_user_info(serializer, user_id):
     today = datetime.now()
     last_login_date = datetime.strptime(str(user.last_login.date()), "%Y-%m-%d")
     attend_date = datetime.strptime(str(user_info.attend.date()), "%Y-%m-%d")
-    
+
     user_attend = last_login_date - attend_date
 
     if user_attend.days == 1:
@@ -38,7 +38,7 @@ def check_user_info(serializer, user_id):
     else:
         user_info.day = 1
 
-    # 정상 학습시, 학습 시작일 오늘로 설정. 
+    # 정상 학습시, 학습 시작일 오늘로 설정.
     if attend_date != last_login_date:
         user_info.total_study_day += 1
         user_info.attend = today
@@ -85,3 +85,27 @@ def check_achieve(user_id):
         user.achieve.add(9)
     if user_info.quizzes_count >= 100:
         user.achieve.add(10)
+
+
+def user_quiz_pass_update(user_id):
+    """유저 퀴즈 통과 시 작동되는 함수
+
+    유저레벨, 경험치, 학습일수, 연속학습일 수 반영
+
+    """
+    user = get_object_or_404(User, pk=user_id)
+    user_info = get_object_or_404(UserInfo, player_id=user_id)
+
+    # 유저 경험치 반영
+    earn_exp = 50
+    user_info.experiment += earn_exp
+
+    if user_info.experiment >= user_info.max_experiment:
+        user_info.level += 1
+        user_info.experiment -= user_info.max_experiment
+        user_info.max_experiment += (user_info.level - 1) * 10
+
+    user_info.save()
+
+    # 저장된 유저정보에 따른 칭호 지급 확인
+    check_achieve(user_id)
