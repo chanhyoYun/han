@@ -5,6 +5,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 import random, string
 import os
+from drf_extra_fields.fields import Base64ImageField
 
 from users.models import User, Achievement, UserInfo
 from users.customtoken import user_email_verify_token
@@ -62,6 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     achieve = AchievementSerializer(many=True, required=False)
+    image = Base64ImageField(required=False)
 
     class Meta:
         model = User
