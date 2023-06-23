@@ -90,10 +90,9 @@ def check_achieve(user_id):
 def user_quiz_pass_update(user_id):
     """유저 퀴즈 통과 시 작동되는 함수
 
-    유저레벨, 경험치, 학습일수, 연속학습일 수 반영
+    UserInfo의 경험치를 업데이트 할 때 사용
 
     """
-    user = get_object_or_404(User, pk=user_id)
     user_info = get_object_or_404(UserInfo, player_id=user_id)
 
     # 유저 경험치 반영

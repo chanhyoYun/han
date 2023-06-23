@@ -1,7 +1,6 @@
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from crawled_data.generators import QuizGenerator
-from rest_framework import permissions
 
 
 class PuzzleCreateView(APIView):
