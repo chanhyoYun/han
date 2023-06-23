@@ -13,9 +13,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 
 class JwtTokenAuthMiddleware(BaseMiddleware):
-    def __init__(self, inner):
-        self.inner = inner
+    """JWT토큰인증 미들웨어
 
+    웹소켓 요청에 대해 JWT토큰 사용자 인증을 처리합니다.
+    """
     async def __call__(self, scope, receive, send):
         await self.authenticate(scope)
         return await super().__call__(scope, receive, send)

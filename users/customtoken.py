@@ -4,6 +4,13 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 class CustomToken(Token):
+    """JWT 커스텀 토큰
+
+    for_user 메소드를 커스텀하여
+    CustomAccessToken과 CustomRefreshToken에서 for_user 호출 시
+    이메일과 유저네임을 포함하여 토큰을 제공합니다.
+    소셜 로그인 완료처리에서 사용됩니다.
+    """
     @classmethod
     def for_user(cls, user):
         token = super().for_user(user)

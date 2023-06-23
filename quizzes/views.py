@@ -4,34 +4,17 @@ from rest_framework.response import Response
 from quizzes.serializers import (
     QuizSuggestSerializer,
     OptionSerializer,
-    QuizSerializer,
     QuizResultSerializer,
     QuizReportSerializer,
 )
-from rest_framework.generics import get_object_or_404
-from quizzes.models import UserQuiz
-from quizzes.generators import QuizGenerator
 from users.user_info import check_user_info
 
 
 class QuizResultView(APIView):
     """퀴즈 뷰
 
-    get요청시 퀴즈를 제공합니다.
     post요청시 퀴즈결과를 받아 처리합니다.
     """
-
-    def get(self, request):
-        """퀴즈 뷰 get
-
-        퀴즈를 제공합니다.
-
-        Returns:
-            정상 200: 퀴즈 데이터 제공
-        """
-        quiz = QuizGenerator.generate()
-        serializer = QuizSerializer(quiz, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """퀴즈 뷰 post
