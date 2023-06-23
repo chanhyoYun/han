@@ -11,7 +11,7 @@ class QuizSuggestSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserQuiz
         fields = "__all__"
-    
+
 
 class OptionSerializer(serializers.ModelSerializer):
     """보기 시리얼라이저
@@ -48,7 +48,6 @@ class QuizResultSerializer(serializers.Serializer):
     퀴즈풀이 결과를 받을때 사용됩니다.
     """
 
-    id = serializers.IntegerField()
     solved = serializers.BooleanField()
 
 
@@ -60,4 +59,9 @@ class QuizReportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuizReport
-        fields = ("user", "content", "quiz_type", "quiz_content",)
+        fields = (
+            "user",
+            "content",
+            "quiz_type",
+            "quiz_content",
+        )
