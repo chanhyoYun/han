@@ -4,10 +4,10 @@ from django.db import models
 class NaverQuiz(models.Model):
     """네이버 퀴즈에서 크롤링 한 퀴즈 모델
 
-    퀴즈의 제목, 해설, 정답률이 저장되는 모델입니다.
+    퀴즈 문제, 해설, 정답률이 저장되는 모델입니다.
 
     Attributes:
-        title (CharField): 제목.
+        title (CharField): 문제.
         explain (TextField): 해설.
         rate (PositiveIntegerField): 정답률. 양수.
     """
