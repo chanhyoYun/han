@@ -9,11 +9,12 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 from dotenv import load_dotenv
 
-# dotenv에서 key값을 참조하기 때문에 dotenv를 load 해와야 함
+# dotenv에서 key값을 참조하기 때문에 dotenv를 load
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
+# 장고 기능을 사용하기 위한 초기 세팅
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 import django
 
 django.setup()

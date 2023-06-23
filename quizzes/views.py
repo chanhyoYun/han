@@ -76,11 +76,21 @@ class QuizSuggestView(APIView):
 
 
 class QuizAcceptView(APIView):
-    """유저 퀴즈를 pass 시켜주는 view"""
+    """유저 퀴즈를 통과 시켜주는 뷰"""
 
     permission_classes = [permissions.IsAdminUser]
 
     def patch(self, request, quiz_id):
+        """유저 퀴즈 통과
+
+        Args:
+            request: 요청한 사용자 정보
+            quiz_id: 변경할 퀴즈 pk값
+
+        Returns:
+            정상 200: 유저 퀴즈 및 유저 정보 업데이트 완료
+            오류 404: 요청한 퀴즈를 찾을 수 없음
+        """
         quiz = get_object_or_404(UserQuiz, id=quiz_id)
         quiz.is_pass = True
         user_quiz_pass_update(quiz.user_id)

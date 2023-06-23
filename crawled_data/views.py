@@ -7,15 +7,13 @@ from rest_framework import permissions
 class PuzzleCreateView(APIView):
     """퍼즐 생성 View"""
 
-    permission_classes = [permissions.IsAuthenticated]
-
     def get(self, request):
         """퀴즈 생성 뷰
 
         QuizGenerator로 퀴즈를 생성해서 Return
 
         Returns:
-            quiz: 유형별로 만들어 준 데이터를 내보내줌
+            quiz: 유형별로 생성한 퀴즈 데이터
         """
         param = request.GET.get("type")
         param_dict = {

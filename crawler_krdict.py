@@ -3,11 +3,12 @@ import os
 import re
 from dotenv import load_dotenv
 
-# dotenv에서 key값을 참조하기 때문에 dotenv를 load 해와야 함
+# dotenv에서 key값을 참조하기 때문에 dotenv를 load
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
+# 장고 기능을 사용하기 위한 초기 세팅
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 import django
 
 django.setup()
@@ -16,16 +17,31 @@ from crawled_data.models import KrDictQuiz, KrDictQuizExample, KrDictQuizExplain
 
 # 파일 바뀔 때 마다 경로 바꿔서 설정
 with open(
-    "F:/nbc/final_project/전체 내려받기_한국어기초사전_JSON_20230612/1079331_51959.json",
+    "데이터 뽑아 낼 json 파일 경로",
     "r",
     encoding="utf-8",
 ) as file:
     data = json.load(file)
 
 word_list = data["LexicalResource"]["Lexicon"]["LexicalEntry"]
+
+# 특수문자가 포함 된 단어는 제외
 pattern = r"[^\w\s]"
 
+
 def kr_dict():
+    """한국어 기초 사전 json 데이터에서 필요한 값을 들고오는 함수
+
+    Returns:
+        word_data(list): [{
+            "word": "단어",
+            "explain": "단어에 대한 설명. list 형태",
+            "difficulty": "단어의 난이도. 0(없음), 1(초급), 2(중급), 3(고급)",
+            "example": [
+                "예시 유형(구, 문장)" : "예시 내용"
+            ],
+        }]
+    """
     word_data = []
 
     for i in range(len(word_list)):
@@ -74,7 +90,6 @@ def kr_dict():
                 my_explain.append(feats["val"])
 
         # difficulty 난이도
-        # 0(없음), 1(초급), 2(중급), 3(고급)
         my_difficulty = 0
         try:
             feat = word_list[i]["feat"]
@@ -147,7 +162,3 @@ if __name__ == "__main__":
             )
             my_example.save()
     print("데이터 베이스에 저장 완료!!")
-
-
-# with open("words.json", "w", encoding="utf-8") as file:
-#     json.dump(word_data, file, ensure_ascii=False)
