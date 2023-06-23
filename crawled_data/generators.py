@@ -1,7 +1,6 @@
 from crawled_data.models import NaverQuiz, KrDictQuiz, KrDictQuizExplain
 from crawled_data.serializers import (
     NaverQuizSerializer,
-    KrDictQuizSerializer,
     FillInTheBlankSerializer,
     MeaningSerializer,
 )
@@ -34,10 +33,18 @@ class QuizGenerator:
     """
 
     def __init__(self, puzzle: list):
+        """초기 설정
+
+        Args:
+            puzzle (list): 문제유형
+
+        Raises:
+            TypeError: 문제 유형에 int값 아닌 경우 에러 발생
+        """
         self._all_quiz_count = KrDictQuiz.objects.all().count()
         # 매개변수 체크
         if any(not isinstance(p, int) for p in puzzle):
-            raise ValueError("문제 유형 개수 중에 int값이 아닌 게 포함되어 있습니다.")
+            raise TypeError("문제 유형 개수 중에 int값이 아닌 게 포함되어 있습니다.")
 
         # 문제 유형[이지선다, 뜻풀이, 빈칸 채우기, 십자말 풀이 순]
         self.puzzle_category = {
@@ -52,7 +59,13 @@ class QuizGenerator:
         self._puzzles = puzzle
 
     def generator(self):
-        puzzle_list = dict()
+        """전체 문제 생성기
+
+        Returns:
+            puzzle_list(dict): 각 함수에서 문제 유형 개수만큼 문제들 리턴받아 딕셔너리로 저장해서 리턴
+        """
+
+        puzzle_list = {}
 
         # 각 퍼즐 개수
         puzzle_list["counts"] = self._puzzles
@@ -66,6 +79,14 @@ class QuizGenerator:
         return puzzle_list
 
     def one_of_two(self, puzzle_count):
+        """이지선다형 생성
+
+        Args:
+            puzzle_count (int): 이지선다형 문제 개수
+
+        Returns:
+            _type_: _description_
+        """
         quiz_objects_ids = NaverQuiz.objects.values_list("id", flat=True)
         id_list = list(quiz_objects_ids)
         quiz_ids = random.sample(id_list, k=puzzle_count)
@@ -74,7 +95,7 @@ class QuizGenerator:
         return serializer.data
 
     def meaning(self, puzzle_count):
-        """단어의 의미를 주고 몇 번이 답인지 맞추기
+        """단어의 의미를 주고 몇 번이 답인지 맞추기 생서
 
 
         Args:
@@ -91,7 +112,7 @@ class QuizGenerator:
         return serializer.data
 
     def fill_in_the_blank(self, puzzle_count):
-        """빈칸에 알맞은 말 맞추기
+        """빈칸에 알맞은 말 맞추기 생성
 
         Args:
             puzzle_count (int): 배정된 퍼즐 수
@@ -106,6 +127,7 @@ class QuizGenerator:
         # 전체 설명문 개수 count
         all_quiz_array = range(0, self._all_quiz_count + 1)
         quiz = []
+        # 빈 시리얼라이즈 만들기
         serializer = FillInTheBlankSerializer()
 
         # 뽑은 샘플 중에 적합하지 않은 쿼리셋이 있을 경우 다시 뽑음
@@ -124,16 +146,21 @@ class QuizGenerator:
         # kiwi 라이브러리 이용 단어 구멍 뚫기
         for k in range(puzzle_count):
             right_answer = serializer.data[k]["dict_word"]["word"]
+            # 정답 토크나이징
             right_answer_tokenizes = kiwi.tokenize(right_answer)
             subtract_word = []
+            # 토크나이징한 정답 중에서 어미 제외하고 subtract_word로 다시 합치기
             for rat in right_answer_tokenizes:
+                # 어미 제외
                 if rat.tag != "EF":
                     subtract_word.append(rat)
 
             examples = serializer.data[k]["dict_word"]["examples"]
             emptyed_examples = []
+            # 각 예제들 토크나이징
             for example in examples:
                 tokenized_example = kiwi.tokenize(example["content"])
+                # 토크나이징한 예제 형태소 들 중에서 토크나이징한 정답에 포함되는 형태소들 O로 대체
                 for te in tokenized_example:
                     if te.form in [form.form for form in subtract_word]:
                         example["content"] = (
@@ -144,7 +171,7 @@ class QuizGenerator:
 
                 emptyed_examples.append(example)
 
-            # 구멍 뚫은 예제로 대체
+            # 예제를 O으로 구멍 뚫은 예제로 대체
             examples = emptyed_examples
 
             # 예제 개수 제한
@@ -153,36 +180,52 @@ class QuizGenerator:
             checked_list = []
             count = 0
             _max_count = 100
+            # 성능 문제로 최대 100번으로 제한
             while len(examples_list) < _maximum_explain and count < _max_count + 1:
                 ran_num = random.randint(0, len(all_examples) - 1)
 
+                # 랜덤으로 픽한 예제 중복되지 않도록 제한
                 if ran_num not in checked_list:
                     checked_list.append(ran_num)
 
                 picked_example = all_examples[ran_num]["content"]
+                # 랜덤으로 선택한 예제 중에 아직 examples_list에 포함되어 있지 않고 O을 포함하고 있는 예제를 추가
                 if picked_example not in examples_list and "O" in picked_example:
                     examples_list.append(picked_example)
                 count += 1
 
+            # 시리얼라이징한 데이터 중에 선택된 examples_list리스트로 대체
             serializer.data[k]["dict_word"]["examples"] = examples_list
 
         return serializer.data
 
     def crossword_puzzle(self, puzzle_count):
+        """십자말퍼즐 생성
+
+        Args:
+            puzzle_count (int): 십자말퍼즐 개수
+
+        Raises:
+            ValueError: 문제 뽑아내는 시간 고려 0 혹은 1개로 제한
+
+        Returns:
+            json_cross_word(dict): json화한 십자말퍼즐 데이터
+        """
         # 문제 뽑아내는 시간이 너무 길어서 1개로 제한
         if puzzle_count > 1:
             raise ValueError("십자말퍼즐은 0 혹은 1개만 가능합니다.")
 
+        # 고정 변수. 필요시 수정 가능
         _array_size = 6  # 행렬 크기
         _voca_number = 8  # 단어 수
 
+        # CrossWordPuzzleGenerator를 이용해 퍼즐 생성
         cross_word_puzzle = CrossWordPuzzleGenerator(_array_size, _voca_number)
         voca_array, voca_list = cross_word_puzzle.generate()
         json_cross_word = json.dumps(
             {"problems": voca_array, "problem_data": voca_list},
             ensure_ascii=False,
         )
-        print(json_cross_word)
         return json_cross_word
 
 
@@ -192,6 +235,7 @@ class CrossWordPuzzleGenerator:
         self._array_size = size  # 행렬 크기
         self._voca_number = num  # 단어 수
 
+        # 단어 설명들 중에서 content만 뽑아낸 prefetch
         explains_prefetch = Prefetch(
             "explains",
             queryset=KrDictQuizExplain.objects.only("content").exclude(
@@ -199,32 +243,43 @@ class CrossWordPuzzleGenerator:
             )[:2],
         )
 
+        # 전체 단어 리스트
         self._word_list = (
             KrDictQuiz.objects.prefetch_related(explains_prefetch)
             .annotate(explains_content=ArrayAgg("explains__content"))
             .values_list("id", "word", "explains_content")
         )
-        # self._word_list = list(
-        #     KrDictQuiz.objects.values_list("id", "word", "explains__content")
-        # )
+
+        # 이미 사용된 단어의 인덱스 저장 (성능 개선)
         self.used_word_index = []
+
+        # 방향 지정
         self._orientation = ["right", "bottom"]
+
         # 단어 집어넣는 거 실패 여부 체크하는 변수
         self.double = False
 
     def generate(self):
+        """십자말 퍼즐 초기화 및 생성
+
+        Returns:
+            voca_array(list): 십자말퍼즐을 리스트형태로 변환해 리턴
+
+            voca_list(dict): 십자말퍼즐 관련된 데이터들 저장해 리턴
+        """
         # 십자말 퍼즐 초기화
         voca_array = np.full((self._array_size, self._array_size), " ")
 
         # 단어 설명 목록
         voca_list = []
 
-        # 단어 삽입 시도
+        # 최대 단어 개수만큼 뽑아낼 때까지 단어 삽입 시도
         while True:
             if self.voca_to_puzzle(voca_array, voca_list):
                 if len(voca_list) >= self._voca_number:
                     break
 
+        # 넘파이 배열을 리스트로 변환
         voca_array = voca_array.tolist()
         return voca_array, voca_list
 
@@ -236,8 +291,8 @@ class CrossWordPuzzleGenerator:
             return False
         else:
             # 첫 단어일 경우
-            # 단어가 공백을 포함하거나 글자 길이 1일 경우 제외한 단어 리스트 중에서 하나를 선택함
             if len(voca_list) == 0:
+                # 단어가 공백을 포함하거나 글자 길이 1일 경우 제외한 모든 단어 리스트
                 voca_candidates = [
                     word
                     for i, word in enumerate(self._word_list)
@@ -247,7 +302,7 @@ class CrossWordPuzzleGenerator:
                 ]
                 # 방향 랜덤
                 orientation = random.choice(self._orientation)
-                # 위치 좌상단 랜덤
+                # 위치 좌상단 랜덤 (무작위 투입 시 실패할 때마다 새로 뽑아야 하므로 성능 고려해 아예 좌상단 고정)
                 [row, col] = [
                     random.randint(0, self._array_size // 2 - 1),
                     random.randint(0, self._array_size // 2 - 1),
@@ -276,6 +331,8 @@ class CrossWordPuzzleGenerator:
                         else:
                             break
 
+                    # 기존에 배치된 단어의 랜덤한 글자로 시작하는 새로운 단어 리스트 중에서
+                    # 단어가 공백을 포함하거나 글자 길이 1일 경우 제외한 모든 단어 리스트
                     voca_candidates = [
                         word
                         for word in self.find_words_starting_with(pick_one_letter)
@@ -283,8 +340,10 @@ class CrossWordPuzzleGenerator:
                         and " " not in word[1]
                         and len(word[1]) > 1
                     ]
+
+                    # 방향, 위치 정하기
                     if self.double:
-                        # 방향 랜덤
+                        # 한번 실패했을 경우 방향, 위치 랜덤
                         positions = [
                             (row, col)
                             for row in range(self._array_size)
@@ -326,11 +385,19 @@ class CrossWordPuzzleGenerator:
                     self.double = False
                     return True
 
-            # 죄다 실패했을 때
+            # 죄다 실패했을 때 self.double을 True로 바꾸고 다시 함수 실행
             self.double = True
             return False
 
     def find_words_starting_with(self, letter):
+        """어떤 글자로 시작하는 단어 리스트 뽑기
+
+        Args:
+            letter (str): 선택된 글자
+
+        Returns:
+            matched_words(list): 선택된 글자로 시작하는 모든 단어 리스트
+        """
         # KrDictQuiz에서 letter로 시작하는 단어들을 모두 찾아서 반환
         explains_prefetch = Prefetch(
             "explains",
@@ -339,6 +406,7 @@ class CrossWordPuzzleGenerator:
             )[:2],
         )
 
+        # letter로 시작하는 단어를 뽑기
         matched_words = (
             KrDictQuiz.objects.filter(word__startswith=letter)
             .prefetch_related(explains_prefetch)
@@ -352,13 +420,17 @@ class CrossWordPuzzleGenerator:
 
     def try_place_word(self, puzzle, voca_list, word_info, orientation, row, col):
         """삽입 가능한지 확인하고 넣는 함수"""
+
+        # 김치, 김치볶음밥처럼 이미 voca_list에 서로간 포함되는 단어가 있을 경우 False 반환
         for info in voca_list:
             if word_info[1] in info["word"] or info["word"] in word_info[1]:
                 return False
-
+        # can_place_word함수에서 해당 위치, 해당 방향으로 단어가 들어갈 수 있는지 판단하고
+        # True라면 place_word함수로 위치
         if self.can_place_word(puzzle, word_info[1], row, col, orientation):
             self.place_word(puzzle, word_info[1], row, col, orientation)
 
+            # 자모 라이브러리로 단어의 초성만을 뽑아서 voca_hint로 반환
             allInit = []
             for x in word_info[1]:
                 temp = h2j(x)
@@ -374,6 +446,8 @@ class CrossWordPuzzleGenerator:
                 "position": (row, col),
                 "orientation": orientation,
             }
+
+            # voca_list에 삽입된 단어에 관련된 info들을 새로 삽입
             voca_list.append(voca_info)
             self.used_word_index.append(word_info[0])
             return True
@@ -382,6 +456,7 @@ class CrossWordPuzzleGenerator:
 
     def can_place_word(self, puzzle, word, row, col, orientation):
         """삽입 가능 여부 판단 함수"""
+        # 각 방향에 따라 단어가 추가됐을 때 이미 다른 단어가 위치해 있거나, 배열을 넘어가면 False리턴
         if orientation == "right":
             if col + len(word) > self._array_size:
                 return False
