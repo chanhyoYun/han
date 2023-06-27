@@ -14,17 +14,20 @@ def check_user_info(serializer, user_id):
     user_info = get_object_or_404(UserInfo, player_id=user_id)
 
     # 유저 경험치 반영
+    print(serializer)
     solved_quizzes = [x for x in serializer if x["solved"]]
+    solved_crossword_quizzes = [x for x in serializer if x["crossword"]]
     earn_exp = 10 * len(solved_quizzes)
-    user_info.experiment += earn_exp
+    earn_exp_crossword = 250 * len(solved_crossword_quizzes)
+    user_info.experiment += earn_exp + earn_exp_crossword
 
-    if user_info.experiment >= user_info.max_experiment:
+    while user_info.experiment >= user_info.max_experiment:
         user_info.level += 1
         user_info.experiment -= user_info.max_experiment
         user_info.max_experiment += (user_info.level - 1) * 10
 
     # 유저 푼 문제 갯수 카운터
-    user_info.quizzes_count += len(solved_quizzes)
+    user_info.quizzes_count += len(solved_quizzes + solved_crossword_quizzes)
 
     # 유저 학습일수, 연속 학습일수 반영
     today = datetime.now()
