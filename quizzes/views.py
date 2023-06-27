@@ -31,7 +31,9 @@ class QuizResultView(APIView):
             오류 400: 올바르지 않은 입력
             오류 401: 올바르지 않은 토큰
         """
+
         serializer = QuizResultSerializer(data=request.data, many=True)
+
         if serializer.is_valid():
             check_user_info(serializer.data, request.user.id)
 

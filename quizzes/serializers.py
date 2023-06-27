@@ -48,6 +48,7 @@ class QuizResultSerializer(serializers.Serializer):
     퀴즈풀이 결과를 받을때 사용됩니다.
     """
 
+    crossword = serializers.BooleanField(required=False)
     solved = serializers.BooleanField()
 
 
