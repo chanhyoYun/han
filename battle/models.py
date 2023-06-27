@@ -75,3 +75,27 @@ class BattleHistory(models.Model):
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class Notification(models.Model):
+    """알림 모델
+
+    알림 모델입니다.
+    """
+
+    user_sender = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        related_name="user_sender",
+        on_delete=models.CASCADE,
+    )
+    user_receiver = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        related_name="user_reciever",
+        on_delete=models.CASCADE,
+    )
+    status = models.CharField(max_length=264, null=True, blank=True, default="unread")
+    type_of_notification = models.CharField(max_length=264, null=True, blank=True)

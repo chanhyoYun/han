@@ -1,10 +1,16 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from battle.models import CurrentBattleList, BattleUser
+from battle.models import CurrentBattleList, BattleUser, Notification
 from users.models import User
 from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
+
+from channels.db import database_sync_to_async
+from channels.layers import get_channel_layer
+from users.models import User
+from django.contrib.auth.models import AnonymousUser
+# from battle.serializers import NotificationSerializer
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -75,3 +81,53 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         if not check_already_in:
             BattleUser.objects.create(btl=battle_room, participant=user)
+        pass
+
+
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def websocket_connect(self, event):
+        await self.accept()
+        notifications = await self.get_notification(self.scope["user"].id)
+        await self.send(json.dumps(notifications))
+        self.room_name = "test_consumer"
+        self.room_group_name = "test_consumer_group"
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
+    async def websocket_receive(self, event):
+        data_to_get = json.loads(event["text"])
+        user_to_get = await self.get_user(int(data_to_get))
+        get_of = await self.create_notification(user_to_get)
+        self.room_group_name = "test_consumer_group"
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            self.room_group_name,
+            {"type": "send_notification", "value": json.dumps(get_of)},
+        )
+
+    async def websocket_disconnect(self, event):
+        pass
+
+    async def send_notification(self, event):
+        await self.send(json.dumps({"type": "websocket.send", "data": event}))
+        
+    @database_sync_to_async
+    def create_notification(self, receiver, typeof="task_created", status="unread"):
+        notification_to_create = Notification.objects.create(
+            user_receiver=receiver, type_of_notification=typeof
+        )
+        return (
+            notification_to_create.user_reciever.username,
+            notification_to_create.type_of_notification,
+        )
+
+    @database_sync_to_async
+    def get_notification(self, user_id):
+        notifications = Notification.objects.filter(user_receiver=user_id)
+        return list(notifications.values())
+    
+    @database_sync_to_async
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except:
+            return AnonymousUser()
