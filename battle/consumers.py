@@ -9,8 +9,6 @@ from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from users.models import User
-from django.contrib.auth.models import AnonymousUser
-# from battle.serializers import NotificationSerializer
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -20,47 +18,44 @@ class BattleConsumer(AsyncWebsocketConsumer):
     """
 
     async def connect(self):
-        """웹소켓 연결
+        """웹소켓 연결"""
+        await self.accept()
+        notifications = await self.get_notification()
+        await self.send(json.dumps(notifications))
 
-        Args:
-            self.room_name (str): 프론트엔드에서 전달받은 룸 이름
-            self.room_group_name (str): 동일한 메세지를 전달받을 그룹
-        """
-        self.user = self.scope["user"].username
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+    async def disconnect(self, code):
+        """웹소켓 연결해제"""
+        # await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        pass
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        type_dict = {
+            "join_room": self.receive_join_room,
+            "invitation": self.receive_invitation,
+            "chat_message": self.receive_chat_message,
+        }
+        await type_dict[data["type"]](data)
+
+    async def receive_join_room(self, data):
+        self.room_name = data["room"]
         self.room_group_name = "chat_%s" % self.room_name
-
+        await self.join_room()
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
-        # 웹소켓 연결 시점
-        await self.accept()
+    async def receive_invitation(self, data):
+        receiver = data["receiver"]
+        notification = await self.create_notification(receiver)
+        chat_message = {"type": "send_message", "message": notification}
+        await self.channel_layer.group_send(f"user_{receiver}", chat_message)
 
-        # accept되는 시점에 방에 배틀 인원에 추가
-        await self.join_game()
+    async def receive_chat_message(self, data):
+        user = self.scope["user"]
+        message = data["message"]
+        chat_message = {"type": "send_message", "message": f"{user}: {message}"}
+        await self.channel_layer.group_send(self.room_group_name, chat_message)
 
-    async def disconnect(self, close_code):
-        """웹소켓 연결 해제"""
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        """메세지 전송
-
-        Args:
-            text_data_json (dict): 프론트엔드 request
-            message (str): 메세지 정보
-        """
-        text_data_json = json.loads(text_data)
-        user = text_data_json["roomData"]["host"]
-        message = text_data_json["message"]
-
-        # 그룹에게 같은 메세지 전달
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "chat_message", "message": f"{user}: {message}"},
-        )
-
-    async def chat_message(self, event):
+    async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
 
         receive 메소드에서 group_send로 메세지를 보냈을 때 받는 메소드
@@ -71,8 +66,8 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": message}))
 
     @database_sync_to_async
-    def join_game(self):
-        user = get_object_or_404(User, username=self.user)
+    def join_room(self):
+        user = self.scope["user"]
         battle_room = CurrentBattleList.objects.get(id=self.room_name)
 
         check_already_in = BattleUser.objects.filter(
@@ -81,53 +76,22 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         if not check_already_in:
             BattleUser.objects.create(btl=battle_room, participant=user)
-        pass
 
-
-class NotificationConsumer(AsyncWebsocketConsumer):
-    async def websocket_connect(self, event):
-        await self.accept()
-        notifications = await self.get_notification(self.scope["user"].id)
-        await self.send(json.dumps(notifications))
-        self.room_name = "test_consumer"
-        self.room_group_name = "test_consumer_group"
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-
-    async def websocket_receive(self, event):
-        data_to_get = json.loads(event["text"])
-        user_to_get = await self.get_user(int(data_to_get))
-        get_of = await self.create_notification(user_to_get)
-        self.room_group_name = "test_consumer_group"
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_notification", "value": json.dumps(get_of)},
-        )
-
-    async def websocket_disconnect(self, event):
-        pass
-
-    async def send_notification(self, event):
-        await self.send(json.dumps({"type": "websocket.send", "data": event}))
-        
     @database_sync_to_async
-    def create_notification(self, receiver, typeof="task_created", status="unread"):
-        notification_to_create = Notification.objects.create(
-            user_receiver=receiver, type_of_notification=typeof
+    def get_notification(self):
+        user = self.scope["user"]
+        notifications = Notification.objects.filter(user_receiver=user.id)
+        return list(notifications.values())
+
+    @database_sync_to_async
+    def create_notification(self, receiver, typeof="invitation"):
+        user = User.objects.get(id=receiver)
+        notification = Notification.objects.create(
+            user_sender=self.scope["user"],
+            user_receiver=user,
+            type_of_notification=typeof,
         )
         return (
-            notification_to_create.user_reciever.username,
-            notification_to_create.type_of_notification,
+            notification.user_sender.username,
+            notification.type_of_notification,
         )
-
-    @database_sync_to_async
-    def get_notification(self, user_id):
-        notifications = Notification.objects.filter(user_receiver=user_id)
-        return list(notifications.values())
-    
-    @database_sync_to_async
-    def get_user(self, user_id):
-        try:
-            return User.objects.get(id=user_id)
-        except:
-            return AnonymousUser()
