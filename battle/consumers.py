@@ -25,6 +25,8 @@ class BattleConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """웹소켓 연결"""
         await self.accept()
+        self.room_group_name = "user_%s" % self.scope["user"].id
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         notifications = await self.get_notification()
         await self.send(json.dumps(notifications))
 
@@ -60,7 +62,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
     async def receive_invitation(self, data):
         receiver = data["receiver"]
         notification = await self.create_notification(receiver)
-        chat_message = {"type": "send_message", "message": notification}
+        chat_message = {"type": "send_notification", "message": notification}
         await self.channel_layer.group_send(f"user_{receiver}", chat_message)
 
     async def receive_chat_message(self, data):
@@ -115,6 +117,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.room_group_name, end_message)
             await self.send_result()
 
+    async def send_notification(self, event):
+        """초대 전송"""
+        await self.send(text_data=json.dumps(event))
+
     async def send_quiz(self):
         """퀴즈 전송
 
@@ -136,10 +142,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         receive 메소드에서 group_send로 메세지를 보냈을 때 받는 메소드
         """
-        message = event["message"]
-
-        # 웹소켓에 메세지 전달
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
     def join_room(self):
