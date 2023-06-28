@@ -50,7 +50,7 @@ class AchievementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Achievement
-        fields = ["id", "title", "comment"]
+        fields = ["id", "title", "comment", "image_url"]
 
     def __str__(self):
         return self.title
