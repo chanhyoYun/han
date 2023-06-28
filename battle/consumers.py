@@ -19,17 +19,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.quizzes = []
+        self.quiz_participant = 0
         self.quiz_count = 0
-        self.quiz_participant = {}
 
     async def connect(self):
         """웹소켓 연결"""
         await self.accept()
-        self.room_group_name = "user_%s" % self.scope["user"].id
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         notifications = await self.get_notification()
-        message = {"type": "send_notification", "message": notifications}
-        await self.channel_layer.group_send(self.room_group_name, message)
+        await self.send(json.dumps(notifications))
 
     async def disconnect(self, code):
         """웹소켓 연결해제"""
@@ -48,7 +45,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
         type_dict = {
             "join_room": self.receive_join_room,
             "invitation": self.receive_invitation,
-            "read_notification": self.receive_read_notification,
             "chat_message": self.receive_chat_message,
             "start_game": self.receive_start_game,
             "correct_answer": self.receive_correct_answer,
@@ -64,17 +60,21 @@ class BattleConsumer(AsyncWebsocketConsumer):
     async def receive_invitation(self, data):
         receiver = data["receiver"]
         notification = await self.create_notification(receiver)
-        chat_message = {"type": "send_notification", "message": notification}
+        chat_message = {
+            "type": "send_message",
+            "method": "chat_message",
+            "message": notification,
+        }
         await self.channel_layer.group_send(f"user_{receiver}", chat_message)
-
-    async def receive_read_notification(self, data):
-        notification_id = data["notification"]
-        await self.read_notification(notification_id)
 
     async def receive_chat_message(self, data):
         user = self.scope["user"]
         message = data["message"]
-        chat_message = {"type": "send_message", "message": f"{user}: {message}"}
+        chat_message = {
+            "type": "send_message",
+            "method": "chat_message",
+            "message": f"{user}: {message}",
+        }
         await self.channel_layer.group_send(self.room_group_name, chat_message)
 
     async def receive_start_game(self, data):
@@ -87,14 +87,27 @@ class BattleConsumer(AsyncWebsocketConsumer):
                     {"type":"유형", "message":"메세지"}
         """
         self.quiz_participant = await self.get_quiz_participant()
-        if len(self.quiz_participant) > 1:
+
+        if self.quiz_participant > 1:
+            self.quiz_count = 0
+            await self.get_quiz()
             message = data["message"]
-            start_message = {"type": "send_message", "message": f"알림: {message}"}
+            start_message = {
+                "type": "send_message",
+                "method": "chat_message",
+                "message": f"알림: {message}",
+            }
+            quiz_message = {
+                "type": "send_message",
+                "method": "send_quiz",
+                "quiz": self.quizzes,
+            }
             await self.channel_layer.group_send(self.room_group_name, start_message)
-            await self.send_quiz()
+            await self.channel_layer.group_send(self.room_group_name, quiz_message)
         else:
             error_message = {
                 "type": "send_message",
+                "method": "chat_message",
                 "message": "알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, error_message)
@@ -109,45 +122,44 @@ class BattleConsumer(AsyncWebsocketConsumer):
                     {"type":"유형", "message":"메세지"}
         """
         if self.quiz_count < 9:
+            user = self.scope["user"]
             message = data["message"]
-            next_message = {"type": "send_message", "message": f"알림: {message}"}
+            next_message = {
+                "type": "send_message",
+                "method": "chat_message",
+                "message": f"알림: {user} {message}",
+            }
             await self.channel_layer.group_send(self.room_group_name, next_message)
             self.quiz_count += 1
 
-            correct_user_id = self.scope["user"].id
-            self.quiz_participant[correct_user_id]["correct_count"] += 1
-            await self.send_quiz()
+            quiz_message = {
+                "type": "send_message",
+                "method": "quiz",
+                "quiz": self.quizzes[self.quiz_count],
+            }
+            await self.channel_layer.group_send(self.room_group_name, quiz_message)
+
         else:
-            self.quiz_count = 0
-            end_message = {"type": "send_message", "message": "알림: 게임 종료"}
+            end_message = {
+                "type": "send_message",
+                "method": "chat_message",
+                "message": "알림: 게임 종료",
+            }
+            result_message = {
+                "type": "send_message",
+                "method": "result",
+                "result": self.quiz_participant,
+            }
             await self.channel_layer.group_send(self.room_group_name, end_message)
-            await self.send_result()
-
-    async def send_notification(self, event):
-        """초대 전송"""
-        await self.send(text_data=json.dumps(event))
-
-    async def send_quiz(self):
-        """퀴즈 전송
-
-        생성 된 퀴즈를 순서에 맞게 전송해주는 메소드
-        """
-        quiz_message = {"type": "quiz", "quiz": self.quizzes[self.quiz_count]}
-        await self.send(text_data=json.dumps(quiz_message))
-
-    async def send_result(self):
-        """결과 전송
-
-        참가자와 참가자 별 정답 개수를 전송해주는 메소드
-        """
-        result_message = {"type": "result", "result": self.quiz_participant}
-        await self.send(text_data=json.dumps(result_message))
+            await self.channel_layer.group_send(self.room_group_name, result_message)
 
     async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
 
         receive 메소드에서 group_send로 메세지를 보냈을 때 받는 메소드
         """
+
+        # 웹소켓에 메세지 전달
         await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
@@ -173,31 +185,20 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_quiz_participant(self):
-        """퀴즈 참가자 확인
+        """퀴즈 참가자 수 확인
 
-        함수 호출 시의 퀴즈 참가자를 확인 후 참가지 dict를 return하는 메소드
+        함수 호출 시의 퀴즈 참가자 수를 확인 후 return하는 메소드
         """
         battle_room = CurrentBattleList.objects.get(id=self.room_name)
         quiz_participant = BattleUser.objects.filter(btl=battle_room)
         serializers = BattleParticipantSerializer(instance=quiz_participant, many=True)
-        return_dict = {}
-        for row in serializers.data:
-            return_dict[row["participant"]["id"]] = {
-                "username": row["participant"]["username"],
-                "correct_count": 0,
-            }
-        return return_dict
+        return len(serializers.data)
 
     @database_sync_to_async
     def get_notification(self):
-        notifications = Notification.objects.filter(
-            user_receiver=self.scope["user"],
-            status="unread",
-        )
-        return [
-            {"id": row.id, "sender": row.user_sender.username, "room": row.btl.id}
-            for row in notifications
-        ]
+        user = self.scope["user"]
+        notifications = Notification.objects.filter(user_receiver=user.id)
+        return list(notifications.values())
 
     @database_sync_to_async
     def create_notification(self, receiver, typeof="invitation"):
@@ -205,17 +206,9 @@ class BattleConsumer(AsyncWebsocketConsumer):
         notification = Notification.objects.create(
             user_sender=self.scope["user"],
             user_receiver=user,
-            btl_id=self.room_name,
             type_of_notification=typeof,
         )
-        return {
-            "id": notification.id,
-            "sender": notification.user_sender.username,
-            "room": notification.btl.id,
-        }
-
-    @database_sync_to_async
-    def read_notification(self, notification_id):
-        notification = Notification.objects.get(id=notification_id)
-        notification.status = "read"
-        notification.save()
+        return (
+            notification.user_sender.username,
+            notification.type_of_notification,
+        )
