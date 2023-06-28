@@ -47,6 +47,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "chat_message": self.receive_chat_message,
             "start_game": self.receive_start_game,
             "correct_answer": self.receive_correct_answer,
+            "result": self.receive_result,
         }
         await type_dict[data["type"]](data)
 
@@ -118,9 +119,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
         quiz_count가 9개 이상이 되면(10문제가 출제되면) 결과 처리 메소드로 전송
         Args:
             data : 프론트에서 받아온 데이터.
-                    {"type":"유형", "message":"메세지"}
+                    {"type":"유형", "message":"메세지", "end":true}
         """
-        if self.quiz_count < 9:
+        end = data.get("end")
+        if not end:
             user = self.scope["user"]
             message = data["message"]
             next_message = {
@@ -131,26 +133,28 @@ class BattleConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.room_group_name, next_message)
             self.quiz_count += 1
 
-            quiz_message = {
+            next_message = {
                 "type": "send_message",
-                "method": "quiz",
-                "quiz": self.quizzes[self.quiz_count],
+                "method": "next_quiz",
+                "message": "다음 문제로 넘어갑니다.",
             }
-            await self.channel_layer.group_send(self.room_group_name, quiz_message)
-
+            await self.channel_layer.group_send(self.room_group_name, next_message)
         else:
             end_message = {
                 "type": "send_message",
-                "method": "chat_message",
-                "message": "알림: 게임 종료",
-            }
-            result_message = {
-                "type": "send_message",
-                "method": "result",
-                "result": self.quiz_participant,
+                "method": "end_quiz",
+                "message": "게임이 종료되었습니다. 정보를 집계합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, end_message)
-            await self.channel_layer.group_send(self.room_group_name, result_message)
+
+    async def receive_result(self, event):
+        user = self.scope["user"]
+        result_message = {
+            "type": "send_message",
+            "method": "chat_message",
+            "message": f"{user}의 정답 개수 : {self.quiz_count}",
+        }
+        await self.channel_layer.group_send(self.room_group_name, result_message)
 
     async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
