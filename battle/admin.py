@@ -4,3 +4,4 @@ from battle.models import *
 admin.site.register(BattleUser)
 admin.site.register(BattleHistory)
 admin.site.register(CurrentBattleList)
+admin.site.register(Notification)
