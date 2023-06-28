@@ -30,8 +30,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         """웹소켓 연결해제"""
-        # await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        pass
+        # await self.leave_room()
 
     async def receive(self, text_data):
         """웹소켓 receive
@@ -173,6 +172,21 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         if not check_already_in:
             BattleUser.objects.create(btl=battle_room, participant=user)
+
+    @database_sync_to_async
+    def leave_room(self):
+        """방 나가기
+
+        disconnect 시 유저가 방을 나가게 하는 메소드
+        is_host = True인 경우 방 자체를 삭제
+        """
+        user = self.scope["user"]
+        room_user = BattleUser.objects.get(participant=user)
+        if room_user.is_host:
+            battle_room = CurrentBattleList.objects.get(id=self.room_name)
+            battle_room.delete()
+        else:
+            room_user.delete()
 
     @database_sync_to_async
     def get_quiz(self):
