@@ -25,8 +25,15 @@ class BattleConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """웹소켓 연결"""
         await self.accept()
+        self.room_group_name = "user_%s" % self.scope["user"].id
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         notifications = await self.get_notification()
-        await self.send(json.dumps(notifications))
+        message = {
+            "type": "send_message",
+            "method": "notification",
+            "message": notifications,
+        }
+        await self.channel_layer.group_send(self.room_group_name, message)
 
     async def disconnect(self, code):
         """웹소켓 연결해제"""
@@ -45,6 +52,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         type_dict = {
             "join_room": self.receive_join_room,
             "invitation": self.receive_invitation,
+            "read_notification": self.receive_read_notification,
             "chat_message": self.receive_chat_message,
             "start_game": self.receive_start_game,
             "correct_answer": self.receive_correct_answer,
@@ -62,10 +70,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
         notification = await self.create_notification(receiver)
         chat_message = {
             "type": "send_message",
-            "method": "chat_message",
+            "method": "notification",
             "message": notification,
         }
         await self.channel_layer.group_send(f"user_{receiver}", chat_message)
+
+    async def receive_read_notification(self, data):
+        notification_id = data["notification"]
+        await self.read_notification(notification_id)
 
     async def receive_chat_message(self, data):
         user = self.scope["user"]
@@ -196,9 +208,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_notification(self):
-        user = self.scope["user"]
-        notifications = Notification.objects.filter(user_receiver=user.id)
-        return list(notifications.values())
+        notifications = Notification.objects.filter(
+            user_receiver=self.scope["user"],
+            status="unread",
+        )
+        return [
+            {"id": row.id, "sender": row.user_sender.username, "room": row.btl.id}
+            for row in notifications
+        ]
 
     @database_sync_to_async
     def create_notification(self, receiver, typeof="invitation"):
@@ -206,9 +223,17 @@ class BattleConsumer(AsyncWebsocketConsumer):
         notification = Notification.objects.create(
             user_sender=self.scope["user"],
             user_receiver=user,
+            btl_id=self.room_name,
             type_of_notification=typeof,
         )
-        return (
-            notification.user_sender.username,
-            notification.type_of_notification,
-        )
+        return {
+            "id": notification.id,
+            "sender": notification.user_sender.username,
+            "room": notification.btl.id,
+        }
+
+    @database_sync_to_async
+    def read_notification(self, notification_id):
+        notification = Notification.objects.get(id=notification_id)
+        notification.status = "read"
+        notification.save()
