@@ -98,5 +98,6 @@ class Notification(models.Model):
         related_name="user_reciever",
         on_delete=models.CASCADE,
     )
+    btl = models.ForeignKey(CurrentBattleList, on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=264, null=True, blank=True, default="unread")
     type_of_notification = models.CharField(max_length=264, null=True, blank=True)
