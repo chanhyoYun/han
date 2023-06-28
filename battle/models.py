@@ -40,6 +40,7 @@ class CurrentBattleList(models.Model):
     max_users = models.IntegerField(default=2)
     is_private = models.BooleanField(null=False, default=False)
     room_password = models.IntegerField(null=True)
+    btl_start = models.BooleanField(default=False)
 
 
 class BattleUser(models.Model):
