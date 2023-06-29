@@ -22,6 +22,8 @@ class CurrentBattleList(models.Model):
         is_private (BooleanField) : 비공개방 여부
 
         room_password (IntegerField) : 비공개방 비밀번호
+
+        btl_start (BooleanField) : 게임 시작 여부
     """
 
     btl_category_choices = (

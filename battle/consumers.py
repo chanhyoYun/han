@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from battle.models import CurrentBattleList, BattleUser, Notification
-from users.models import User
+from users.models import User, UserInfo
 from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 
@@ -96,12 +96,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
         참가자가 2명 이상일 때는 게임을 진행, 그 이외에는 에러 메세지를 전송
         Args:
             data : 프론트에서 받아온 데이터.
-                    {"type":"유형", "message":"메세지"}
+                    {"type":"유형", "method":"메소드", message":"메세지"}
         """
         self.quiz_participant = await self.get_quiz_participant()
 
         if self.quiz_participant > 1:
             self.quiz_count = 0
+            await self.room_status_change()
             await self.get_quiz()
             message = data["message"]
             start_message = {
@@ -131,7 +132,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         quiz_count가 9개 이상이 되면(10문제가 출제되면) 결과 처리 메소드로 전송
         Args:
             data : 프론트에서 받아온 데이터.
-                    {"type":"유형", "message":"메세지", "end":true}
+                    {"type":"유형", "method":"메소드", "message":"메세지"(, "end":true)}
         """
         end = data.get("end")
         self.quiz_count += 1
@@ -158,8 +159,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 "message": "📢 : 게임이 종료되었습니다. 정보를 집계합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, end_message)
+            await self.room_status_change()
 
     async def receive_result(self, event):
+        """결과 전송
+
+        정답 개수를 프론트로 보내고 배틀 포인트를 지급하는 메소드
+        """
         user = self.scope["user"]
         result_message = {
             "type": "send_message",
@@ -167,6 +173,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "message": f"{user}의 정답 개수 : {self.quiz_count}",
         }
         await self.channel_layer.group_send(self.room_group_name, result_message)
+        await self.give_battlepoint()
 
     async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
@@ -188,6 +195,28 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         if not check_already_in:
             BattleUser.objects.create(btl=battle_room, participant=user)
+
+    @database_sync_to_async
+    def room_status_change(self):
+        """방 시작 여부 판별
+
+        함수가 실행될 때 방 정보에 따라서 btl_start를 True 혹은 False로 바꿔주는 메소드
+        """
+        battle_room = CurrentBattleList.objects.get(id=self.room_name)
+        is_start = battle_room.btl_start
+        is_start = False if is_start else True
+        battle_room.save()
+
+    @database_sync_to_async
+    def give_battlepoint(self):
+        """배틀 포인트 지급
+
+        유저 정보로 UserInfo를 찾아 맞춘 정답 개수만큼 배틀 포인트를 올려주는 메소드
+        """
+        user = self.scope["user"]
+        user_info = UserInfo.objects.get(player=user)
+        user_info.battlepoint += self.quiz_count
+        user_info.save()
 
     @database_sync_to_async
     def leave_room(self):

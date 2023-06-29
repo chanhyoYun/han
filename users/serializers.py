@@ -149,7 +149,7 @@ class RankingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInfo
-        fields = ["player", "level", "experiment"]
+        fields = ["player", "level", "experiment", "battlepoint"]
 
 
 class UserInfoSerializer(serializers.ModelSerializer):

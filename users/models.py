@@ -95,6 +95,7 @@ class UserInfo(models.Model):
         day : 연속 출석일수
         attend : 마지막 학습 날짜
         quizzes_count : 푼 문제 갯수
+        battlepoint : 함께 겨루기에서 맞춘 문제 개수
     """
 
     player = models.ForeignKey(User, related_name="player", on_delete=models.CASCADE)
@@ -107,3 +108,4 @@ class UserInfo(models.Model):
         auto_now=False, auto_now_add=True, blank=True, null=True
     )
     quizzes_count = models.PositiveIntegerField(default=0)
+    battlepoint = models.PositiveIntegerField(default=0)
