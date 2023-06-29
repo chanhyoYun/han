@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from battle.models import CurrentBattleList, BattleUser, Notification
-from users.models import User
+from users.models import User, UserInfo
 from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 
@@ -167,6 +167,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "message": f"{user}의 정답 개수 : {self.quiz_count}",
         }
         await self.channel_layer.group_send(self.room_group_name, result_message)
+        await self.give_battlepoint()
 
     async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
@@ -188,6 +189,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         if not check_already_in:
             BattleUser.objects.create(btl=battle_room, participant=user)
+
+    @database_sync_to_async
+    def give_battlepoint(self):
+        user = self.scope["user"]
+        user_info = UserInfo.objects.get(player=user)
+        user_info.battlepoint += self.quiz_count
+        user_info.save()
 
     @database_sync_to_async
     def leave_room(self):

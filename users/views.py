@@ -288,4 +288,4 @@ class RankingView(ListAPIView):
 
         type=battle시, 쿼리셋을 배틀랭킹으로 생성합니다.
         """
-        return User.objects.all().order_by("-battlepoint")
+        return UserInfo.objects.filter(player__is_active=True).order_by("-battlepoint")

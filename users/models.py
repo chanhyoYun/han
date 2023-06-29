@@ -5,7 +5,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class Achievement(models.Model):
     title = models.CharField(max_length=32, verbose_name="칭호명")
     comment = models.CharField(max_length=255)
-    image_url = models.CharField(max_length=255, verbose_name="이미지 주소")
+    # image_url = models.CharField(max_length=255, verbose_name="이미지 주소")
 
     def __str__(self):
         return self.title
@@ -95,6 +95,7 @@ class UserInfo(models.Model):
         day : 연속 출석일수
         attend : 마지막 학습 날짜
         quizzes_count : 푼 문제 갯수
+        battlepoint : 함께 겨루기에서 맞춘 문제 개수
     """
 
     player = models.ForeignKey(User, related_name="player", on_delete=models.CASCADE)
@@ -107,3 +108,4 @@ class UserInfo(models.Model):
         auto_now=False, auto_now_add=True, blank=True, null=True
     )
     quizzes_count = models.PositiveIntegerField(default=0)
+    battlepoint = models.PositiveIntegerField(default=0)
