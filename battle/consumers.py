@@ -273,11 +273,11 @@ class BattleConsumer(AsyncWebsocketConsumer):
             btl_id=self.room_name,
             type_of_notification=typeof,
         )
-        return {
+        return [{
             "id": notification.id,
             "sender": notification.user_sender.username,
             "room": notification.btl.id,
-        }
+        }]
 
     @database_sync_to_async
     def read_notification(self, notification_id):
