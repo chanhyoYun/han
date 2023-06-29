@@ -60,6 +60,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         type_dict = {
             "join_room": self.receive_join_room,
+            "leave_room": self.receive_leave_room,
             "invitation": self.receive_invitation,
             "read_notification": self.receive_read_notification,
             "chat_message": self.receive_chat_message,
@@ -74,6 +75,32 @@ class BattleConsumer(AsyncWebsocketConsumer):
         self.room_group_name = "chat_%s" % self.room_name
         await self.join_room()
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
+        room_member = await self.get_quiz_participant()
+        room_message = {
+            "type": "send_message",
+            "method": "room_check",
+            "message": room_member,
+        }
+        await self.channel_layer.group_send(self.room_group_name, room_message)
+
+    async def receive_leave_room(self, data):
+        await self.leave_room()
+        user = self.scope["user"]
+        message = data["message"]
+        leave_message = {
+            "type": "send_message",
+            "method": "chat_message",
+            "message": f"📢 {user}가 {message}",
+        }
+        await self.channel_layer.group_send(self.room_group_name, leave_message)
+        room_member = await self.get_quiz_participant()
+        room_message = {
+            "type": "send_message",
+            "method": "room_check",
+            "message": room_member,
+        }
+        await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_invitation(self, data):
         receiver = data["receiver"]
@@ -110,7 +137,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         """
         self.quiz_participant = await self.get_quiz_participant()
         room = await self.room_db_search()
-        if self.quiz_participant > 1 and not room.btl_start:
+        if len(self.quiz_participant) > 1 and not room.btl_start:
             # 진행중으로 상태 바꿈
             await self.room_start(room)
 
@@ -282,7 +309,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         battle_room = CurrentBattleList.objects.get(id=self.room_name)
         quiz_participant = BattleUser.objects.filter(btl=battle_room)
         serializers = BattleParticipantSerializer(instance=quiz_participant, many=True)
-        return len(serializers.data)
+        return serializers.data
 
     @database_sync_to_async
     def get_notification(self):
@@ -304,11 +331,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
             btl_id=self.room_name,
             type_of_notification=typeof,
         )
-        return [{
-            "id": notification.id,
-            "sender": notification.user_sender.username,
-            "room": notification.btl.id,
-        }], user.id
+        return [
+            {
+                "id": notification.id,
+                "sender": notification.user_sender.username,
+                "room": notification.btl.id,
+            }
+        ], user.id
 
     @database_sync_to_async
     def read_notification(self, notification_id):
