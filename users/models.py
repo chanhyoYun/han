@@ -5,7 +5,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class Achievement(models.Model):
     title = models.CharField(max_length=32, verbose_name="칭호명")
     comment = models.CharField(max_length=255)
-    # image_url = models.CharField(max_length=255, verbose_name="이미지 주소")
+    image_url = models.CharField(max_length=255, verbose_name="이미지 주소")
 
     def __str__(self):
         return self.title
