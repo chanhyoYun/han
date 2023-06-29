@@ -8,6 +8,12 @@ from django.core.exceptions import ValidationError
 from users.models import User, Achievement, UserInfo
 
 
+@admin.action(description="is_admin = True")
+def is_active_true(modeladmin, request, queryset):
+    """Django Admin에서 is_admin을 일괄적으로 True 처리"""
+    queryset.update(is_active=True)
+
+
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(
@@ -54,6 +60,7 @@ class UserChangeForm(forms.ModelForm):
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
+    actions = [is_active_true]
 
     list_display = ["email", "id", "is_active", "is_admin"]
     list_filter = ["is_admin", "is_active"]
