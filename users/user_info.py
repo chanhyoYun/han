@@ -14,9 +14,10 @@ def check_user_info(serializer, user_id):
     user_info = get_object_or_404(UserInfo, player_id=user_id)
 
     # 유저 경험치 반영
-    print(serializer)
-    solved_quizzes = [x for x in serializer if x["solved"]]
-    solved_crossword_quizzes = [x for x in serializer if x["crossword"]]
+    solved_quizzes = [x for x in serializer if "solved" in x and x["solved"]]
+    solved_crossword_quizzes = [
+        x for x in serializer if "crossword" in x and x["crossword"]
+    ]
     earn_exp = 10 * len(solved_quizzes)
     earn_exp_crossword = 250 * len(solved_crossword_quizzes)
     user_info.experiment += earn_exp + earn_exp_crossword
