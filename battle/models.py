@@ -44,6 +44,9 @@ class CurrentBattleList(models.Model):
     room_password = models.IntegerField(null=True)
     btl_start = models.BooleanField(default=False)
 
+    def __str__(self):
+        return str(self.btl_title)
+
 
 class BattleUser(models.Model):
     """배틀 참가자

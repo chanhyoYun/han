@@ -8,6 +8,10 @@ from django.shortcuts import get_object_or_404
 
 from crawled_data.generators import QuizGenerator
 from .serializers import BattleParticipantSerializer
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -24,9 +28,15 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         """웹소켓 연결"""
+        self.page = self.scope["page"]
         await self.accept()
         self.room_group_name = "user_%s" % self.scope["user"].id
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
+        # 로비
+        if self.page == "lobby":
+            await self.channel_layer.group_add("lobby", self.channel_name)
+
         notifications = await self.get_notification()
         message = {
             "type": "send_message",
@@ -99,8 +109,11 @@ class BattleConsumer(AsyncWebsocketConsumer):
                     {"type":"유형", "method":"메소드", message":"메세지"}
         """
         self.quiz_participant = await self.get_quiz_participant()
+        room = await self.room_db_search()
+        if self.quiz_participant > 1 and not room.btl_start:
+            # 진행중으로 상태 바꿈
+            await self.room_start(room)
 
-        if self.quiz_participant > 1:
             self.quiz_count = 0
             await self.room_status_change()
             await self.get_quiz()
@@ -124,6 +137,21 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 "message": "📢 알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, error_message)
+
+    @database_sync_to_async
+    def room_db_search(self):
+        cache = CurrentBattleList.objects.get(id=self.room_name)
+        return cache
+
+    @database_sync_to_async
+    def room_start(self, room):
+        room.btl_start = True
+        room.save()
+
+    @database_sync_to_async
+    def room_end(self, room):
+        room.btl_start = False
+        room.save()
 
     async def receive_correct_answer(self, data):
         """정답 처리
@@ -172,6 +200,9 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "method": "chat_message",
             "message": f"{user}의 정답 개수 : {self.quiz_count}",
         }
+        room = await self.room_db_search()
+        await self.room_end(room)
+
         await self.channel_layer.group_send(self.room_group_name, result_message)
         await self.give_battlepoint()
 
@@ -284,3 +315,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
         notification = Notification.objects.get(id=notification_id)
         notification.status = "read"
         notification.save()
+
+
+# @receiver(post_save, sender=CurrentBattleList)
+# def lobby_room_check(sender, instance, **kwargs):
+#     """로비 배틀리스트 받기"""
+#     print(instance)
+#     channel_layer = get_channel_layer()
+#     async_to_sync(channel_layer.group_send)(
+#         "lobby", {"type": "roomInfo", "message": "asd"}
+#     )
