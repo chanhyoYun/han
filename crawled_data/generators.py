@@ -146,6 +146,16 @@ class QuizGenerator:
         # kiwi 라이브러리 이용 단어 구멍 뚫기
         for k in range(puzzle_count):
             right_answer = serializer.data[k]["dict_word"]["word"]
+            # 자음 힌트
+            allInit = []
+            for x in serializer.data[k]["dict_word"]["word"]:
+                temp = h2j(x)
+                imf = j2hcj(temp)  # init,middle,final
+                allInit.append(imf[0])
+
+            voca_hint = "".join(allInit)
+            serializer.data[k]["dict_word"]["hint"] = voca_hint
+
             # 정답 토크나이징
             right_answer_tokenizes = kiwi.tokenize(right_answer)
             subtract_word = []
