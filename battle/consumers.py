@@ -77,13 +77,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     async def receive_invitation(self, data):
         receiver = data["receiver"]
-        notification = await self.create_notification(receiver)
+        notification, receiver_id = await self.create_notification(receiver)
         chat_message = {
             "type": "send_message",
             "method": "notification",
             "message": notification,
         }
-        await self.channel_layer.group_send(f"user_{receiver}", chat_message)
+        await self.channel_layer.group_send(f"user_{receiver_id}", chat_message)
 
     async def receive_read_notification(self, data):
         notification_id = data["notification"]
@@ -297,7 +297,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_notification(self, receiver, typeof="invitation"):
-        user = User.objects.get(id=receiver)
+        user = User.objects.get(email=receiver)
         notification = Notification.objects.create(
             user_sender=self.scope["user"],
             user_receiver=user,
@@ -308,7 +308,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "id": notification.id,
             "sender": notification.user_sender.username,
             "room": notification.btl.id,
-        }]
+        }], user.id
 
     @database_sync_to_async
     def read_notification(self, notification_id):
