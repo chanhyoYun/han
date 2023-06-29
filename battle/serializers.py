@@ -33,6 +33,7 @@ class BattleListSerializer(serializers.ModelSerializer):
             "host_user",
             "btl_created_at",
             "btl_updated_at",
+            "btl_start",
             "participants",
             "max_users",
             "is_private",
