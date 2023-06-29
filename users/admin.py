@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from users.models import User, Achievement, UserInfo
 
 
-@admin.action(description="is_admin = True")
+@admin.action(description="is_active = True")
 def is_active_true(modeladmin, request, queryset):
     """Django Admin에서 is_admin을 일괄적으로 True 처리"""
     queryset.update(is_active=True)
