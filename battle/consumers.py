@@ -107,7 +107,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             start_message = {
                 "type": "send_message",
                 "method": "chat_message",
-                "message": f"알림: {message}",
+                "message": f"📢 알림: {message}",
             }
             quiz_message = {
                 "type": "send_message",
@@ -120,7 +120,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             error_message = {
                 "type": "send_message",
                 "method": "chat_message",
-                "message": "알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
+                "message": "📢 알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, error_message)
 
@@ -134,28 +134,28 @@ class BattleConsumer(AsyncWebsocketConsumer):
                     {"type":"유형", "message":"메세지", "end":true}
         """
         end = data.get("end")
-        if not end:
-            user = self.scope["user"]
-            message = data["message"]
-            next_message = {
-                "type": "send_message",
-                "method": "chat_message",
-                "message": f"알림: {user} {message}",
-            }
-            await self.channel_layer.group_send(self.room_group_name, next_message)
-            self.quiz_count += 1
+        self.quiz_count += 1
+        user = self.scope["user"]
+        message = data["message"]
+        next_message = {
+            "type": "send_message",
+            "method": "chat_message",
+            "message": f"📢 알림: {user}이 {message}!! 맞춘 문제 갯수: {self.quiz_count}",
+        }
+        await self.channel_layer.group_send(self.room_group_name, next_message)
 
+        if not end:
             next_message = {
                 "type": "send_message",
                 "method": "next_quiz",
-                "message": "다음 문제로 넘어갑니다.",
+                "message": "📢 다음 문제로 넘어갑니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, next_message)
         else:
             end_message = {
                 "type": "send_message",
                 "method": "end_quiz",
-                "message": "게임이 종료되었습니다. 정보를 집계합니다.",
+                "message": "📢 : 게임이 종료되었습니다. 정보를 집계합니다.",
             }
             await self.channel_layer.group_send(self.room_group_name, end_message)
 
