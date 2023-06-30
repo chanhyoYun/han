@@ -139,7 +139,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         """
         self.quiz_participant = await self.get_quiz_participant()
         room = await self.room_db_search()
-        if room.host_user == self.scope["user"]:
+        if room.host_user_id == self.scope["user"].id:
             if len(self.quiz_participant) > 1 and not room.btl_start:
                 # 진행중으로 상태 바꿈
                 await self.room_start(room)
