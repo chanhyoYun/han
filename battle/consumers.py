@@ -47,7 +47,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         """웹소켓 연결해제"""
-        # await self.leave_room()
+        await self.leave_room()
 
     async def receive(self, text_data):
         """웹소켓 receive
@@ -85,7 +85,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_leave_room(self, data):
-        await self.leave_room()
         user = self.scope["user"]
         message = data["message"]
         leave_message = {
@@ -94,6 +93,9 @@ class BattleConsumer(AsyncWebsocketConsumer):
             "message": f"📢 {user}가 {message}",
         }
         await self.channel_layer.group_send(self.room_group_name, leave_message)
+
+        await self.leave_room()
+
         room_member = await self.get_quiz_participant()
         room_message = {
             "type": "send_message",
@@ -276,20 +278,43 @@ class BattleConsumer(AsyncWebsocketConsumer):
         user_info.battlepoint += self.quiz_count
         user_info.save()
 
-    @database_sync_to_async
-    def leave_room(self):
+    async def leave_room(self):
         """방 나가기
 
         disconnect 시 유저가 방을 나가게 하는 메소드
         is_host = True인 경우 방 자체를 삭제
         """
+
+        # self.room_name 없으면 바로 함수 종료
+        if not hasattr(self, "room_name"):
+            return
+
         user = self.scope["user"]
-        room_user = BattleUser.objects.get(participant=user)
+        room_user = await database_sync_to_async(BattleUser.objects.get)(
+            participant=user
+        )
         if room_user.is_host:
-            battle_room = CurrentBattleList.objects.get(id=self.room_name)
-            battle_room.delete()
+            battle_room = await database_sync_to_async(CurrentBattleList.objects.get)(
+                id=self.room_name
+            )
+            await database_sync_to_async(battle_room.delete)()
+
+            leave_message = {
+                "type": "send_message",
+                "method": "leave_host",
+                "message": f"📢 방장이 나갔습니다.",
+            }
+            await self.channel_layer.group_send(self.room_group_name, leave_message)
         else:
-            room_user.delete()
+            await database_sync_to_async(room_user.delete)()
+
+            room_member = await self.get_quiz_participant()
+            room_message = {
+                "type": "send_message",
+                "method": "room_check",
+                "message": room_member,
+            }
+            await self.channel_layer.group_send(self.room_group_name, room_message)
 
     @database_sync_to_async
     def get_quiz(self):
