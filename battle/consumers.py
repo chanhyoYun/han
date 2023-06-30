@@ -139,33 +139,41 @@ class BattleConsumer(AsyncWebsocketConsumer):
         """
         self.quiz_participant = await self.get_quiz_participant()
         room = await self.room_db_search()
-        if len(self.quiz_participant) > 1 and not room.btl_start:
-            # 진행중으로 상태 바꿈
-            await self.room_start(room)
+        if room.host_user == self.scope["user"]:
+            if len(self.quiz_participant) > 1 and not room.btl_start:
+                # 진행중으로 상태 바꿈
+                await self.room_start(room)
 
-            self.quiz_count = 0
-            await self.room_status_change()
-            await self.get_quiz()
-            message = data["message"]
-            start_message = {
-                "type": "send_message",
-                "method": "chat_message",
-                "message": f"📢 알림: {message}",
-            }
-            quiz_message = {
-                "type": "send_message",
-                "method": "send_quiz",
-                "quiz": self.quizzes,
-            }
-            await self.channel_layer.group_send(self.room_group_name, start_message)
-            await self.channel_layer.group_send(self.room_group_name, quiz_message)
+                self.quiz_count = 0
+                await self.room_status_change()
+                await self.get_quiz()
+                message = data["message"]
+                start_message = {
+                    "type": "send_message",
+                    "method": "chat_message",
+                    "message": f"📢 알림: {message}",
+                }
+                quiz_message = {
+                    "type": "send_message",
+                    "method": "send_quiz",
+                    "quiz": self.quizzes,
+                }
+                await self.channel_layer.group_send(self.room_group_name, start_message)
+                await self.channel_layer.group_send(self.room_group_name, quiz_message)
+            else:
+                error_message = {
+                    "type": "send_message",
+                    "method": "chat_message",
+                    "message": "📢 알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
+                }
+                await self.channel_layer.group_send(self.room_group_name, error_message)
         else:
             error_message = {
-                "type": "send_message",
-                "method": "chat_message",
-                "message": "📢 알림: 유저가 2명 이상이어야 게임이 시작 가능합니다.",
-            }
-            await self.channel_layer.group_send(self.room_group_name, error_message)
+                    "type": "send_message",
+                    "method": "chat_message",
+                    "message": "📢 알림: 방장이 아니면 시작할 수 없습니다.",
+                }
+            self.send(text_data=json.dumps(error_message))
 
     @database_sync_to_async
     def room_db_search(self):
