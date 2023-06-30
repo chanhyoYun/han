@@ -169,10 +169,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.room_group_name, error_message)
         else:
             error_message = {
-                    "type": "send_message",
-                    "method": "chat_message",
-                    "message": "📢 알림: 방장이 아니면 시작할 수 없습니다.",
-                }
+                "type": "send_message",
+                "method": "chat_message",
+                "message": "📢 알림: 방장이 아니면 시작할 수 없습니다.",
+            }
             self.send(text_data=json.dumps(error_message))
 
     @database_sync_to_async
@@ -272,7 +272,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         """
         battle_room = CurrentBattleList.objects.get(id=self.room_name)
         is_start = battle_room.btl_start
-        is_start = False if is_start else True
+        battle_room.btl_start = False if is_start else True
         battle_room.save()
 
     @database_sync_to_async
@@ -285,6 +285,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         user_info = UserInfo.objects.get(player=user)
         user_info.battlepoint += self.quiz_count
         user_info.save()
+        self.quiz_count = 0
 
     async def leave_room(self):
         """방 나가기
