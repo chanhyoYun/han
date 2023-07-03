@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from battle.models import CurrentBattleList, BattleUser
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import UserBattleFriendSerializer
 
 
 class BattleParticipantSerializer(serializers.ModelSerializer):
-    participant = UserSerializer()
+    participant = UserBattleFriendSerializer()
 
     class Meta:
         model = BattleUser

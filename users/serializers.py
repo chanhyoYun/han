@@ -111,6 +111,29 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserBattleFriendSerializer(UserSerializer):
+    followings = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "username",
+            "image",
+            "wear_achievement",
+            "achieve",
+            "followings",
+        ]
+
+    def get_followings(self, obj):
+        followings = obj.followings.values_list("username", "email")
+        return {
+            str(i): {"username": username, "email": email}
+            for i, (username, email) in enumerate(followings)
+        }
+
+
 class UserViewSerializer(serializers.ModelSerializer):
     """유저 뷰 시리얼라이저
 
