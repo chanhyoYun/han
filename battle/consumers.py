@@ -108,6 +108,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         chat_message = {
             "type": "send_message",
             "method": "chat_message",
+            "user": user.id,
             "message": f"{user}: {message}",
         }
         await self.channel_layer.group_send(self.room_group_name, chat_message)
