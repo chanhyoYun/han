@@ -85,28 +85,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_leave_room(self, data):
-        user = self.scope["user"]
-        message = data["message"]
-        leave_message = {
-            "type": "send_message",
-            "method": "chat_message",
-            "message": f"📢 {user}가 {message}",
-        }
-        await self.channel_layer.group_send(self.room_group_name, leave_message)
-
         await self.leave_room()
-
-        # room_member = await self.get_quiz_participant()
-        # room_message = {
-        #     "type": "send_message",
-        #     "method": "room_check",
-        #     "message": room_member,
-        # }
-        # await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_invitation(self, data):
         receiver = data["receiver"]
-        print(receiver)
         notification, receiver_id = await self.create_notification(receiver)
         chat_message = {
             "type": "send_message",
@@ -325,13 +307,21 @@ class BattleConsumer(AsyncWebsocketConsumer):
         else:
             await database_sync_to_async(room_user.delete)()
 
-            room_member = await self.get_quiz_participant()
-            room_message = {
+            user = self.scope["user"]
+            leave_message = {
                 "type": "send_message",
-                "method": "room_check",
-                "message": room_member,
+                "method": "chat_message",
+                "message": f"📢 {user}가 나갔습니다.",
             }
-            await self.channel_layer.group_send(self.room_group_name, room_message)
+            await self.channel_layer.group_send(self.room_group_name, leave_message)
+
+        room_member = await self.get_quiz_participant()
+        room_message = {
+            "type": "send_message",
+            "method": "room_check",
+            "message": room_member,
+        }
+        await self.channel_layer.group_send(self.room_group_name, room_message)
 
     @database_sync_to_async
     def get_quiz(self):
