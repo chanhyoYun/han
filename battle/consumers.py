@@ -12,6 +12,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.http import Http404
 
 
 class BattleConsumer(AsyncWebsocketConsumer):
@@ -127,9 +128,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 len(self.quiz_participant["participant_list"]) > 1
                 and not room.btl_start
             ):
-                # 진행중으로 상태 바꿈
-                await self.room_start(room)
-
                 self.quiz_count = 0
                 await self.room_status_change()
                 await self.get_quiz()
@@ -338,12 +336,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         함수 호출 시의 퀴즈 참가자 수를 확인 후 return하는 메소드
         """
-        # battle_room = CurrentBattleList.objects.get(id=self.room_name)
-        # quiz_participant = BattleUser.objects.filter(btl=battle_room)
-        # serializers = BattleParticipantSerializer(instance=quiz_participant, many=True)
-        room = get_object_or_404(CurrentBattleList, id=self.room_name)
-        serializer = BattleDetailSerializer(room)
-        return serializer.data
+        try:
+            room = get_object_or_404(CurrentBattleList, id=self.room_name)
+            serializer = BattleDetailSerializer(room)
+            return serializer.data
+        except Http404:
+            print("남아있는 방이 없습니다.")
+            return None
 
     @database_sync_to_async
     def get_notification(self):
@@ -378,13 +377,3 @@ class BattleConsumer(AsyncWebsocketConsumer):
         notification = Notification.objects.get(id=notification_id)
         notification.status = "read"
         notification.save()
-
-
-# @receiver(post_save, sender=CurrentBattleList)
-# def lobby_room_check(sender, instance, **kwargs):
-#     """로비 배틀리스트 받기"""
-#     print(instance)
-#     channel_layer = get_channel_layer()
-#     async_to_sync(channel_layer.group_send)(
-#         "lobby", {"type": "roomInfo", "message": "asd"}
-#     )
