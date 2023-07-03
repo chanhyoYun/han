@@ -159,6 +159,7 @@ class QuizGenerator:
             # 정답 토크나이징
             right_answer_tokenizes = kiwi.tokenize(right_answer)
             subtract_word = []
+
             # 토크나이징한 정답 중에서 어미 제외하고 subtract_word로 다시 합치기
             for rat in right_answer_tokenizes:
                 # 어미 제외
@@ -172,7 +173,7 @@ class QuizGenerator:
                 tokenized_example = kiwi.tokenize(example["content"])
                 # 토크나이징한 예제 형태소 들 중에서 토크나이징한 정답에 포함되는 형태소들 O로 대체
                 for te in tokenized_example:
-                    if te.form in [form.form for form in subtract_word]:
+                    if te.form in [form.form for form in right_answer_tokenizes]:
                         example["content"] = (
                             example["content"][: te.start]
                             + "O" * te.len
