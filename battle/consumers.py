@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 
 from crawled_data.generators import QuizGenerator
-from .serializers import BattleParticipantSerializer
+from .serializers import BattleParticipantSerializer, BattleDetailSerializer
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from channels.layers import get_channel_layer
@@ -23,7 +23,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.quizzes = []
-        self.quiz_participant = 0
+        self.quiz_participant = {}
         self.quiz_count = 0
 
     async def connect(self):
@@ -96,16 +96,17 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         await self.leave_room()
 
-        room_member = await self.get_quiz_participant()
-        room_message = {
-            "type": "send_message",
-            "method": "room_check",
-            "message": room_member,
-        }
-        await self.channel_layer.group_send(self.room_group_name, room_message)
+        # room_member = await self.get_quiz_participant()
+        # room_message = {
+        #     "type": "send_message",
+        #     "method": "room_check",
+        #     "message": room_member,
+        # }
+        # await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_invitation(self, data):
         receiver = data["receiver"]
+        print(receiver)
         notification, receiver_id = await self.create_notification(receiver)
         chat_message = {
             "type": "send_message",
@@ -140,7 +141,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
         self.quiz_participant = await self.get_quiz_participant()
         room = await self.room_db_search()
         if room.host_user_id == self.scope["user"].id:
-            if len(self.quiz_participant) > 1 and not room.btl_start:
+            if (
+                len(self.quiz_participant["participant_list"]) > 1
+                and not room.btl_start
+            ):
                 # 진행중으로 상태 바꿈
                 await self.room_start(room)
 
@@ -299,9 +303,13 @@ class BattleConsumer(AsyncWebsocketConsumer):
             return
 
         user = self.scope["user"]
-        room_user = await database_sync_to_async(BattleUser.objects.get)(
-            participant=user
-        )
+        try:
+            room_user = await database_sync_to_async(BattleUser.objects.get)(
+                participant=user
+            )
+        except:
+            return
+
         if room_user.is_host:
             battle_room = await database_sync_to_async(CurrentBattleList.objects.get)(
                 id=self.room_name
@@ -340,10 +348,12 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
         함수 호출 시의 퀴즈 참가자 수를 확인 후 return하는 메소드
         """
-        battle_room = CurrentBattleList.objects.get(id=self.room_name)
-        quiz_participant = BattleUser.objects.filter(btl=battle_room)
-        serializers = BattleParticipantSerializer(instance=quiz_participant, many=True)
-        return serializers.data
+        # battle_room = CurrentBattleList.objects.get(id=self.room_name)
+        # quiz_participant = BattleUser.objects.filter(btl=battle_room)
+        # serializers = BattleParticipantSerializer(instance=quiz_participant, many=True)
+        room = get_object_or_404(CurrentBattleList, id=self.room_name)
+        serializer = BattleDetailSerializer(room)
+        return serializer.data
 
     @database_sync_to_async
     def get_notification(self):
