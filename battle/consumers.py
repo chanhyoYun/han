@@ -191,6 +191,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         next_message = {
             "type": "send_message",
             "method": "chat_message_correct_answer",
+            "correct_user": f"{user}",
             "message": f"📢 알림: {user}이 {message}!! 맞춘 문제 갯수: {self.quiz_count}",
         }
         await self.channel_layer.group_send(self.room_group_name, next_message)
