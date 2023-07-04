@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from users.models import User, Achievement, UserInfo
+from users.models import User, Achievement, UserInfo, UserTimestamp
 
 
 @admin.action(description="is_active = True")
@@ -108,5 +108,10 @@ class UserInfoAdmin(admin.ModelAdmin):
     list_display = ["player"]
 
 
+class UserTimestampAdmin(admin.ModelAdmin):
+    list_display = ["user", "quiz_start", "quiz_end"]
+
+
 admin.site.register(Achievement, AchievementAdmin)
 admin.site.register(UserInfo, UserInfoAdmin)
+admin.site.register(UserTimestamp, UserTimestampAdmin)
