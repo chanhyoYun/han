@@ -229,6 +229,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, result_message)
         await self.give_battlepoint()
 
+        room_member = await self.get_quiz_participant()
+        room_message = {
+            "type": "send_message",
+            "method": "room_check",
+            "message": room_member,
+        }
+        await self.channel_layer.group_send(self.room_group_name, room_message)
+
     async def send_message(self, event):
         """그룹으로부터 각자 메세지 받기
 
