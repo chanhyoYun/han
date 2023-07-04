@@ -9,7 +9,9 @@ from quizzes.serializers import (
 )
 from rest_framework.generics import get_object_or_404
 from quizzes.models import UserQuiz
+from users.models import User, UserTimestamp
 from users.user_info import check_user_info, user_quiz_pass_update
+from django.utils import timezone
 
 
 class QuizResultView(APIView):
@@ -36,6 +38,15 @@ class QuizResultView(APIView):
 
         if serializer.is_valid():
             check_user_info(serializer.data, request.user.id)
+
+            timestamp = (
+                UserTimestamp.objects.filter(user=request.user)
+                .order_by("-quiz_start")
+                .first()
+            )
+            if timestamp:
+                timestamp.quiz_end = timezone.now()
+                timestamp.save()
 
             return Response(status=status.HTTP_200_OK)
         else:

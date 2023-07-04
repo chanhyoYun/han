@@ -109,3 +109,9 @@ class UserInfo(models.Model):
     )
     quizzes_count = models.PositiveIntegerField(default=0)
     battlepoint = models.PositiveIntegerField(default=0)
+
+
+class UserTimestamp(models.Model):
+    user = models.ForeignKey(User, related_name="timestamp", on_delete=models.CASCADE)
+    quiz_start = models.DateTimeField(auto_now_add=True)
+    quiz_end = models.DateTimeField(null=True)

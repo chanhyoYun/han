@@ -1,6 +1,8 @@
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from crawled_data.generators import QuizGenerator
+from users.models import User, UserTimestamp
+from django.contrib.auth.models import AnonymousUser
 
 
 class PuzzleCreateView(APIView):
@@ -26,4 +28,7 @@ class PuzzleCreateView(APIView):
         else:
             quiz_generator = QuizGenerator([3, 3, 4, 0])
         quiz = quiz_generator.generator()
+        if not isinstance(request.user, AnonymousUser):
+            # user = User.objects.get(pk=request.user.id)
+            UserTimestamp.objects.create(user=request.user)
         return Response(quiz)
