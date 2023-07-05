@@ -7,11 +7,7 @@ from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 
 from crawled_data.generators import QuizGenerator
-from .serializers import BattleParticipantSerializer, BattleDetailSerializer
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from .serializers import BattleDetailSerializer
 from django.http import Http404
 
 
@@ -72,6 +68,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await type_dict[data["type"]](data)
 
     async def receive_join_room(self, data):
+        """join_room 타입 receive 처리"""
         self.room_name = data["room"]
         self.room_group_name = "chat_%s" % self.room_name
         await self.join_room()
@@ -86,9 +83,11 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, room_message)
 
     async def receive_leave_room(self, data):
+        """leave_room 타입 receive 처리"""
         await self.leave_room()
 
     async def receive_invitation(self, data):
+        """invitation 타입 receive 처리"""
         receiver = data["receiver"]
         notification, receiver_id = await self.create_notification(receiver)
         chat_message = {
@@ -99,10 +98,12 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(f"user_{receiver_id}", chat_message)
 
     async def receive_read_notification(self, data):
+        """read_notification 타입 receive 처리"""
         notification_id = data["notification"]
         await self.read_notification(notification_id)
 
     async def receive_chat_message(self, data):
+        """chat_message 타입 receive 처리"""
         user = self.scope["user"]
         message = data["message"]
         chat_message = {
@@ -114,7 +115,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, chat_message)
 
     async def receive_start_game(self, data):
-        """게임 진행
+        """게임 진행 (start_game 타입 receive 처리)
 
         퀴즈를 진행하는 메소드.
         참가자가 2명 이상일 때는 게임을 진행, 그 이외에는 에러 메세지를 전송
@@ -159,21 +160,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 "message": "📢 알림: 방장이 아니면 시작할 수 없습니다.",
             }
             self.send(text_data=json.dumps(error_message))
-
-    @database_sync_to_async
-    def room_db_search(self):
-        cache = CurrentBattleList.objects.get(id=self.room_name)
-        return cache
-
-    @database_sync_to_async
-    def room_start(self, room):
-        room.btl_start = True
-        room.save()
-
-    @database_sync_to_async
-    def room_end(self, room):
-        room.btl_start = False
-        room.save()
 
     async def receive_correct_answer(self, data):
         """정답 처리
@@ -246,41 +232,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
         # 웹소켓에 메세지 전달
         await self.send(text_data=json.dumps(event))
 
-    @database_sync_to_async
-    def join_room(self):
-        user = self.scope["user"]
-        battle_room = CurrentBattleList.objects.get(id=self.room_name)
-
-        check_already_in = BattleUser.objects.filter(
-            btl=battle_room, participant=user
-        ).exists()
-
-        if not check_already_in:
-            BattleUser.objects.create(btl=battle_room, participant=user)
-
-    @database_sync_to_async
-    def room_status_change(self):
-        """방 시작 여부 판별
-
-        함수가 실행될 때 방 정보에 따라서 btl_start를 True 혹은 False로 바꿔주는 메소드
-        """
-        battle_room = CurrentBattleList.objects.get(id=self.room_name)
-        is_start = battle_room.btl_start
-        battle_room.btl_start = False if is_start else True
-        battle_room.save()
-
-    @database_sync_to_async
-    def give_battlepoint(self):
-        """배틀 포인트 지급
-
-        유저 정보로 UserInfo를 찾아 맞춘 정답 개수만큼 배틀 포인트를 올려주는 메소드
-        """
-        user = self.scope["user"]
-        user_info = UserInfo.objects.get(player=user)
-        user_info.battlepoint += self.quiz_count
-        user_info.save()
-        self.quiz_count = 0
-
     async def leave_room(self):
         """방 나가기
 
@@ -332,6 +283,54 @@ class BattleConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, room_message)
 
     @database_sync_to_async
+    def room_db_search(self):
+        """방 찾기
+
+        CurrentBattleList에서 원하는 방을 찾아 return
+        """
+        cache = CurrentBattleList.objects.get(id=self.room_name)
+        return cache
+
+    @database_sync_to_async
+    def join_room(self):
+        """방 들어가기
+
+        CurrentBattleList에 유저가 존재하지 않으면 새 BattleUser 객체를 생성시켜주는 메소드
+        """
+        user = self.scope["user"]
+        battle_room = CurrentBattleList.objects.get(id=self.room_name)
+
+        check_already_in = BattleUser.objects.filter(
+            btl=battle_room, participant=user
+        ).exists()
+
+        if not check_already_in:
+            BattleUser.objects.create(btl=battle_room, participant=user)
+
+    @database_sync_to_async
+    def room_status_change(self):
+        """방 시작 여부 판별
+
+        함수가 실행될 때 방 정보에 따라서 btl_start를 True 혹은 False로 바꿔주는 메소드
+        """
+        battle_room = CurrentBattleList.objects.get(id=self.room_name)
+        is_start = battle_room.btl_start
+        battle_room.btl_start = False if is_start else True
+        battle_room.save()
+
+    @database_sync_to_async
+    def give_battlepoint(self):
+        """배틀 포인트 지급
+
+        유저 정보로 UserInfo를 찾아 맞춘 정답 개수만큼 배틀 포인트를 올려주는 메소드
+        """
+        user = self.scope["user"]
+        user_info = UserInfo.objects.get(player=user)
+        user_info.battlepoint += self.quiz_count
+        user_info.save()
+        self.quiz_count = 0
+
+    @database_sync_to_async
     def get_quiz(self):
         """퀴즈 생성
 
@@ -356,6 +355,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_notification(self):
+        """알림 받기"""
         notifications = Notification.objects.filter(
             user_receiver=self.scope["user"],
             status="unread",
@@ -367,6 +367,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_notification(self, receiver, typeof="invitation"):
+        """알림 생성"""
         user = User.objects.get(email=receiver)
         notification = Notification.objects.create(
             user_sender=self.scope["user"],
@@ -384,6 +385,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def read_notification(self, notification_id):
+        """알림 읽기"""
         notification = Notification.objects.get(id=notification_id)
         notification.status = "read"
         notification.save()

@@ -1,4 +1,3 @@
-from django.contrib.auth.base_user import AbstractBaseUser
 from rest_framework_simplejwt.tokens import Token, AccessToken, RefreshToken
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
