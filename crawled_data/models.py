@@ -4,7 +4,7 @@ from django.db import models
 class NaverQuiz(models.Model):
     """네이버 퀴즈에서 크롤링 한 퀴즈 모델
 
-    퀴즈 문제, 해설, 정답률이 저장되는 모델입니다.
+    퀴즈 문제, 해설, 정답률이 저장되는 모델
 
     Attributes:
         title (CharField): 문제.
@@ -23,8 +23,8 @@ class NaverQuiz(models.Model):
 class NaverQuizOption(models.Model):
     """네이버 퀴즈에서 크롤링 한 퀴즈 보기 모델
 
-    각 퀴즈의 보기를 저장합니다.
-    퀴즈id, 보기내용, 정답여부 필드가 있습니다.
+    각 퀴즈의 보기를 저장하는 모델
+    퀴즈id, 보기내용, 정답여부 필드가 존재
 
     Attributes:
         quiz_id (ForeignKey): 연결된 퀴즈 인스턴스의 ID값.
@@ -45,7 +45,7 @@ class NaverQuizOption(models.Model):
 class KrDictQuiz(models.Model):
     """한국어 기초 사전 단어 저장 모델
 
-    한국어 기초 사전에 등재 된 단어들을 담는 모델입니다.
+    한국어 기초 사전에 등재 된 단어들을 담는 모델
 
     Attributes:
         word (CharField): 단어.
@@ -59,7 +59,7 @@ class KrDictQuiz(models.Model):
 class KrDictQuizExplain(models.Model):
     """한국어 기초 사전 단어 설명 저장 모델
 
-    한국어 기초 사전에 등재 된 단어들의 설명을 담는 모델입니다.
+    한국어 기초 사전에 등재 된 단어들의 설명을 담는 모델
 
     Attributes:
         dict_word_id (ForeignKey): 연결된 사전 단어 인스턴스의 ID값
@@ -75,7 +75,7 @@ class KrDictQuizExplain(models.Model):
 class KrDictQuizExample(models.Model):
     """한국어 기초 사전 단어 예시 저장 모델
 
-    한국어 기초 사전에 등재 된 단어들의 예시를 담는 모델입니다.
+    한국어 기초 사전에 등재 된 단어들의 예시를 담는 모델
 
     Attributes:
         dict_word_id (ForeignKey): 연결된 사전 단어 인스턴스의 ID값

@@ -1,7 +1,7 @@
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from crawled_data.generators import QuizGenerator
-from users.models import User, UserTimestamp
+from users.models import UserTimestamp
 from django.contrib.auth.models import AnonymousUser
 
 

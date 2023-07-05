@@ -1,7 +1,7 @@
 from rest_framework.generics import get_object_or_404
 from users.models import User, UserInfo
 from users.serializers import UserSerializer
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def check_user_info(serializer, user_id):

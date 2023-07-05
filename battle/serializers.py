@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from battle.models import CurrentBattleList, BattleUser
-from users.models import User
-from users.serializers import UserBattleFriendSerializer, UserInfoSerializer
+from users.serializers import UserBattleFriendSerializer
 
 
 class BattleParticipantSerializer(serializers.ModelSerializer):
@@ -10,7 +9,6 @@ class BattleParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = BattleUser
         fields = [
-            # "btl",
             "participant",
             "is_host",
         ]

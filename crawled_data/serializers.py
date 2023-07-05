@@ -6,7 +6,7 @@ import random
 class NaverQuizOptionSerializer(serializers.ModelSerializer):
     """네이버 알쏭달쏭 퀴즈 옵션 시리얼라이저
 
-    네이버 알쏭달쏭 퀴즈의 옵션들을 처리할 때 사용합니다.
+    네이버 알쏭달쏭 퀴즈의 옵션들을 처리할 때 사용
     """
 
     class Meta:
@@ -20,7 +20,7 @@ class NaverQuizOptionSerializer(serializers.ModelSerializer):
 class KrDictExplainSerializer(serializers.ModelSerializer):
     """한국어 기초 사전 설명 시리얼라이저
 
-    한국어 기초 사전의 설명들을 처리할 때 사용합니다.
+    한국어 기초 사전의 설명들을 처리할 때 사용
     """
 
     class Meta:
@@ -31,7 +31,7 @@ class KrDictExplainSerializer(serializers.ModelSerializer):
 class KrDictExampleSerializer(serializers.ModelSerializer):
     """한국어 기초 사전 에시 시리얼라이저
 
-    한국어 기초 사전의 예시들을 처리할 때 사용합니다.
+    한국어 기초 사전의 예시들을 처리할 때 사용
     """
 
     class Meta:
@@ -45,8 +45,8 @@ class KrDictExampleSerializer(serializers.ModelSerializer):
 class NaverQuizSerializer(serializers.ModelSerializer):
     """네이버 알쏭달쏭 퀴즈 시리얼라이저
 
-    네이버 알쏭달쏭 퀴즈를 처리할 때 사용합니다.
-    옵션은 NaverQuizOptionSerializer를 통해 처리합니다.
+    네이버 알쏭달쏭 퀴즈를 처리할 때 사용
+    옵션은 NaverQuizOptionSerializer를 통해 처리
     """
 
     options = NaverQuizOptionSerializer(many=True)
@@ -59,8 +59,8 @@ class NaverQuizSerializer(serializers.ModelSerializer):
 class KrDictSerializer(serializers.ModelSerializer):
     """한국어 기초 사전 시리얼라이저
 
-    한국어 기초 사전 모델을 처리할 때 사용합니다.
-    예시는 KrDictExampleSerializer를 통해 처리합니다.
+    한국어 기초 사전 모델을 처리할 때 사용
+    예시는 KrDictExampleSerializer를 통해 처리
     """
 
     examples = KrDictExampleSerializer(many=True)

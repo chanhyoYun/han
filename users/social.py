@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 import os
 from json import JSONDecodeError
 from django.http import JsonResponse

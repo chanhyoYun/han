@@ -3,6 +3,14 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class Achievement(models.Model):
+    """유저 칭호 모델
+
+    Attributes:
+        title (CharField) : 칭호명
+        comment (CharField) : 칭호 설명
+        image_url (CharField) : 칭호 이미지 주소
+    """
+
     title = models.CharField(max_length=32, verbose_name="칭호명")
     comment = models.CharField(max_length=255)
     image_url = models.CharField(max_length=255, verbose_name="이미지 주소")
@@ -37,13 +45,14 @@ class User(AbstractBaseUser):
     """유저 모델
 
     Attributes:
-        email : 로그인 이메일
-        username : 닉네임
-        is_active : 활성화 여부
-        is_admin : 관리자 계정 여부
-        image : 프로필사진 필드
-        achieve : 보유 칭호 필드
-        wear_achievement : 착용중인 칭호 정보
+        email (EmailField) : 로그인 이메일
+        username (CharField) : 닉네임
+        is_active (BooleanField) : 활성화 여부
+        is_admin (BooleanField) : 관리자 계정 여부
+        image (ImageField) : 프로필사진 필드
+        achieve (ManyToManyField) : 보유 칭호 필드
+        wear_achievement (IntegerField) : 착용중인 칭호 정보
+        followings (ManyToManyField) : 유저 팔로잉
     """
 
     email = models.EmailField(
@@ -87,15 +96,15 @@ class UserInfo(models.Model):
     """유저 정보 모델
 
     Attributes:
-        player : 연결되어 있는 유저
-        level : 유저 레벨
-        experiment : 유저 경험치
-        max_experiment : 레벨에 비례한 경험치통
-        total_study_day : 총 학습일수
-        day : 연속 출석일수
-        attend : 마지막 학습 날짜
-        quizzes_count : 푼 문제 갯수
-        battlepoint : 함께 겨루기에서 맞춘 문제 개수
+        player (ForeignKey) : 연결되어 있는 유저
+        level (PositiveIntegerField) : 유저 레벨
+        experiment (PositiveIntegerField) : 유저 경험치
+        max_experiment (IntegerField) : 레벨에 비례한 경험치통
+        total_study_day (PositiveIntegerField): 총 학습일수
+        day (PositiveIntegerField) : 연속 출석일수
+        attend (DateTimeField) : 마지막 학습 날짜
+        quizzes_count (PositiveIntegerField) : 푼 문제 갯수
+        battlepoint (PositiveIntegerField) : 함께 겨루기에서 맞춘 문제 개수
     """
 
     player = models.ForeignKey(User, related_name="player", on_delete=models.CASCADE)
@@ -112,6 +121,16 @@ class UserInfo(models.Model):
 
 
 class UserTimestamp(models.Model):
+    """유저 게임 플레이 기록 모델
+
+    유저가 혼자 문제 풀기를 시도하고 끝낸 시간을 기록하는 모델
+
+    Attributes:
+        user (ForeignKey) : 유저
+        quiz_start (DateTimeField) : 퀴즈 시작시각
+        quiz_end (DateTimeField) : 퀴즈 제출시각
+    """
+
     user = models.ForeignKey(User, related_name="timestamp", on_delete=models.CASCADE)
     quiz_start = models.DateTimeField(auto_now_add=True)
     quiz_end = models.DateTimeField(null=True)

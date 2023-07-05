@@ -3,19 +3,18 @@ from users.models import User
 
 
 class CurrentBattleList(models.Model):
-    """생성된 배틀 리스트 모델
+    """겨루기 방 모델
 
-    생성된 겨루기 리스트입니다.
-
+    생성된 겨루기 방 정보를 담아주는 모델
 
     Attributes:
-        btl_title (CharField) : 배틀 제목
+        btl_title (CharField) : 방 제목
 
-        btl_created_at (DateTimeField) : 배틀 방 생성 시간
+        btl_created_at (DateTimeField) : 방 생성 시간
 
-        btl_updated_at (DateTimeField) : 배틀 시작 시간
+        btl_updated_at (DateTimeField) : 방 시작 시간
 
-        host_user (ForeignKey) : 호스트 유저
+        host_user (ForeignKey) : 방장
 
         max_users (IntegerField) : 최대 인원
 
@@ -51,14 +50,14 @@ class CurrentBattleList(models.Model):
 class BattleUser(models.Model):
     """배틀 참가자
 
-    각 방 별 참가자 리스트입니다.
+    각 방에 참가한 유저 정보를 담아주는 모델
 
     Attributes:
         btl (Foreign Key) : 방 번호
 
         participant (Foreign Key) : 참가자
 
-        is_host (BooleanField) : 참가자 방장 여부
+        is_host (BooleanField) : 방장 여부
     """
 
     btl = models.ForeignKey(
@@ -68,25 +67,19 @@ class BattleUser(models.Model):
     is_host = models.BooleanField(null=False, default=False)
 
 
-class BattleHistory(models.Model):
-    """유저 기록 모델
-
-    유저의 배틀 정보를 기록하는 모델입니다.
-
-
-    Attributes:
-        btl_category (ForeignKey) : 배틀 종류
-
-        user
-    """
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
 class Notification(models.Model):
     """알림 모델
 
-    알림 모델입니다.
+    Attributes:
+        user_sender (ForeignKey): 알림을 보내는 사람
+
+        user_receiver (ForeignKey): 알림을 받는 사람
+
+        btl (ForeignKey): 초대할 방
+
+        status (CharField): 알림 상태
+
+        type_of_notification (CharField): 알림 유형
     """
 
     user_sender = models.ForeignKey(
