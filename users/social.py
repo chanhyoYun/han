@@ -23,8 +23,11 @@ CALLBACK_URI = os.environ.get("FRONTEND_BASE_URL") + os.environ.get(
 )
 
 
-# 구글 로그인
 def google_login(request):
+    """구글 로그인 연결
+
+    구글 소셜 로그인 페이지로 리다이렉트
+    """
     scope = "https://www.googleapis.com/auth/userinfo.email"
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     return redirect(
@@ -33,6 +36,11 @@ def google_login(request):
 
 
 def google_callback(request):
+    """구글 로그인 정보 호출 함수
+
+    구글 리다이렉트 페이지에서 생성된 코드로
+    구글 사용자 정보 받아오기
+    """
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get("code")
@@ -97,11 +105,25 @@ def google_callback(request):
 
 
 class GoogleLogin(SocialLoginView):
+    """구글 소셜 로그인
+
+    구글 소셜 로그인 진행
+    """
+
     adapter_class = google_view.GoogleOAuth2Adapter
     callback_url = CALLBACK_URI
     client_class = OAuth2Client
 
     def post(self, request, *args, **kwargs):
+        """구글 로그인
+
+        구글 소셜 로그인 및 회원가입 진행
+
+        Returns:
+            정상 200 : 구글 소셜 로그인 or 회원가입
+            오류 400 : 구글 소셜 로그인 실패
+            오류 500 : 구글 정보 조회 불가
+        """
         accept = super().post(request, *args, **kwargs)
         accept_status = accept.status_code
 
@@ -128,6 +150,10 @@ class GoogleLogin(SocialLoginView):
 
 
 def kakao_login(request):
+    """카카오 로그인 연결
+
+    카카오 소셜 로그인 페이지로 리다이렉트
+    """
     rest_api_key = os.environ.get("SOCIAL_AUTH_KAKAO_CLIENT_ID")
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={rest_api_key}&redirect_uri={CALLBACK_URI}"
@@ -136,6 +162,11 @@ def kakao_login(request):
 
 @api_view(["GET", "POST"])
 def kakao_callback(request):
+    """카카오 로그인 정보 호출 함수
+
+    카카오 리다이렉트 페이지에서 생성된 코드로
+    카카오 사용자 정보 받아오기
+    """
     rest_api_key = os.environ.get("SOCIAL_AUTH_KAKAO_CLIENT_ID")
     code = request.GET.get("code")
 
@@ -204,11 +235,25 @@ def kakao_callback(request):
 
 
 class KakaoLogin(SocialLoginView):
+    """구글 소셜 로그인
+
+    구글 소셜 로그인 진행
+    """
+
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = CALLBACK_URI
 
     def post(self, request, *args, **kwargs):
+        """카카오 로그인
+
+        카카오 소셜 로그인 및 회원가입 진행
+
+        Returns:
+            정상 200 : 카카오 소셜 로그인 or 회원가입
+            오류 400 : 카카오 소셜 로그인 실패
+            오류 500 : 카카오 정보 조회 불가
+        """
         accept = super().post(request, *args, **kwargs)
         accept_status = accept.status_code
 
@@ -235,6 +280,10 @@ class KakaoLogin(SocialLoginView):
 
 
 def naver_login(request):
+    """네이버 로그인 연결
+
+    네이버 소셜 로그인 페이지로 리다이렉트
+    """
     client_id = os.environ.get("SOCIAL_AUTH_NAVER_CLIENT_ID")
     return redirect(
         f"https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id={client_id}&state=STATE_STRING&redirect_uri={CALLBACK_URI}"
@@ -243,6 +292,11 @@ def naver_login(request):
 
 @api_view(["GET", "POST"])
 def naver_callback(request):
+    """네이버 로그인 정보 호출 함수
+
+    네이버 리다이렉트 페이지에서 생성된 코드로
+    네이버 사용자 정보 받아오기
+    """
     client_id = os.environ.get("SOCIAL_AUTH_NAVER_CLIENT_ID")
     client_secret = os.environ.get("SOCIAL_AUTH_NAVER_SECRET")
     code = request.GET.get("code")
@@ -304,11 +358,25 @@ def naver_callback(request):
 
 
 class NaverLogin(SocialLoginView):
+    """네이버 소셜 로그인
+
+    네이버 소셜 로그인 진행
+    """
+
     adapter_class = naver_view.NaverOAuth2Adapter
     callback_url = CALLBACK_URI
     client_class = OAuth2Client
 
     def post(self, request, *args, **kwargs):
+        """네이버 로그인
+
+        네이버 소셜 로그인 및 회원가입 진행
+
+        Returns:
+            정상 200 : 네이버 소셜 로그인 or 회원가입
+            오류 400 : 네이버 소셜 로그인 실패
+            오류 500 : 네이버 정보 조회 불가
+        """
         accept = super().post(request, *args, **kwargs)
         accept_status = accept.status_code
 
