@@ -292,6 +292,16 @@ class BattleConsumer(AsyncWebsocketConsumer):
         return cache
 
     @database_sync_to_async
+    def room_start(self, room):
+        room.btl_start = True
+        room.save()
+
+    @database_sync_to_async
+    def room_end(self, room):
+        room.btl_start = False
+        room.save()
+
+    @database_sync_to_async
     def join_room(self):
         """방 들어가기
 
